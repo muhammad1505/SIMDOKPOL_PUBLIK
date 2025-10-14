@@ -1,0 +1,127 @@
+<script>
+$(document).ready(function() {
+    function toTitleCase(str) {
+        return str.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
+    $('body').on('input', '.auto-uppercase', function() {
+        $(this).val($(this).val().toUpperCase());
+    });
+    $('body').on('input', '.auto-titlecase', function() {
+        $(this).val(toTitleCase($(this).val()));
+    });
+
+    function togglePasswordVisibility(inputId, toggleId) {
+        const password = $(inputId);
+        const toggle = $(toggleId);
+        const type = password.attr('type') === 'password' ? 'text' : 'password';
+        password.attr('type', type);
+        toggle.toggleClass('fa-eye fa-eye-slash');
+    }
+    $('#togglePassword').on('click', function() {
+        togglePasswordVisibility('#admin_password', '#togglePassword');
+    });
+    $('#togglePasswordConfirm').on('click', function() {
+        togglePasswordVisibility('#admin_password_confirm', '#togglePasswordConfirm');
+    });
+
+    let currentSlide = 1;
+    const totalSlides = $('.stepper-slide').length;
+
+    function showSlide(slideNumber) {
+        $('.stepper-slide').removeClass('active').hide();
+        $(`#slide-${slideNumber}`).fadeIn().addClass('active');
+        currentSlide = slideNumber;
+    }
+
+    function validateSlide(slideNumber) {
+        let isValid = true;
+        $(`#slide-${slideNumber} .is-invalid`).removeClass('is-invalid');
+        $(`#slide-${slideNumber} [required]`).each(function() {
+            if ($(this).val().trim() === '') {
+                isValid = false;
+                $(this).addClass('is-invalid');
+            }
+        });
+        return isValid;
+    }
+
+    $('.next-step').on('click', function() {
+        if (validateSlide(currentSlide)) {
+            if (currentSlide < totalSlides) {
+                showSlide(currentSlide + 1);
+            }
+        } else {
+            Swal.fire('Perhatian', 'Harap isi semua field yang wajib diisi di langkah ini.', 'warning');
+        }
+    });
+
+    $('.prev-step').on('click', function() {
+        if (currentSlide > 1) {
+            showSlide(currentSlide - 1);
+        }
+    });
+
+    $('#setup-form').on('submit', function(e) {
+        e.preventDefault();
+
+        if (!validateSlide(currentSlide)) {
+            Swal.fire('Perhatian', 'Harap isi semua field yang wajib diisi di langkah ini.', 'warning');
+            return;
+        }
+
+        const password = $('#admin_password').val();
+        const confirmPassword = $('#admin_password_confirm').val();
+        if (password !== confirmPassword) {
+            Swal.fire('Error', 'Konfirmasi kata sandi tidak cocok!', 'error');
+            return;
+        }
+        if (password.length < 8) {
+            Swal.fire('Perhatian', 'Kata sandi minimal harus 8 karakter.', 'warning');
+            return;
+        }
+
+        const formData = {
+            kop_baris_1: $('#kop_baris_1').val(),
+            kop_baris_2: $('#kop_baris_2').val(),
+            kop_baris_3: $('#kop_baris_3').val(),
+            nama_kantor: $('#nama_kantor').val(),
+            tempat_surat: $('#tempat_surat').val(),
+            format_nomor_surat: $('#format_nomor_surat').val(),
+            nomor_surat_terakhir: $('#nomor_surat_terakhir').val(),
+            zona_waktu: $('#zona_waktu').val(),
+            archive_duration_days: $('#archive_duration_days').val(), // Ditambahkan
+            admin_nama_lengkap: $('#admin_nama_lengkap').val(),
+            admin_nrp: $('#admin_nrp').val(),
+            admin_pangkat: $('#admin_pangkat').val(),
+            admin_password: password,
+        };
+
+        const $submitButton = $(this).find('button[type="submit"]');
+        $submitButton.html('<span class="spinner-border spinner-border-sm"></span> Menyimpan...').prop('disabled', true);
+
+        $.ajax({
+            url: '/api/setup',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Setup Berhasil!',
+                    text: response.message,
+                    allowOutsideClick: false,
+                }).then(() => {
+                    window.location.href = '/login';
+                });
+            },
+            error: function(jqXHR) {
+                const errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.error : 'Terjadi kesalahan yang tidak diketahui.';
+                Swal.fire('Gagal', errorMsg, 'error');
+                $submitButton.text('Simpan Konfigurasi & Buat Akun').prop('disabled', false);
+            }
+        });
+    });
+});
+</script>

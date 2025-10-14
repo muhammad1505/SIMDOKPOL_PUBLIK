@@ -1,0 +1,23 @@
+# Berkas biner dan hasil kompilasi
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+simdokpol
+
+# Berkas basis data lokal
+*.db
+*.db-journal
+
+# Berkas log dan environment
+*.log
+.env
+
+# Direktori dependensi Go
+vendor/
+# TAPI, JANGAN abaikan folder vendor untuk aset frontend kita
+!web/static/vendor/
+
+# Direktori temporary Air
+tmp/

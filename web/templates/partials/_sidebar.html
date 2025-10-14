@@ -1,0 +1,57 @@
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">SIMDOKPOL</div>
+    </a>
+    <hr class="sidebar-divider my-0" />
+    <li class="nav-item">
+        <a class="nav-link" href="/"><i class="fas fa-fw fa-tachometer-alt"></i><span>Dasbor</span></a>
+    </li>
+    <hr class="sidebar-divider" />
+    <div class="sidebar-heading">Manajemen Dokumen</div>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
+            aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-folder"></i><span>Surat Keterangan</span>
+        </a>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Aksi:</h6>
+                <a class="collapse-item" href="/documents/new">Buat Surat Baru</a>
+                <a class="collapse-item" href="/documents">Daftar Dokumen Aktif</a>
+                <a class="collapse-item" href="/documents/archived">Arsip Dokumen</a>
+            </div>
+        </div>
+    </li>
+    
+    {{if eq .CurrentUser.Peran "SUPER_ADMIN"}}
+    <hr class="sidebar-divider" />
+    <div class="sidebar-heading">Administrasi</div>
+    <li class="nav-item">
+        <a class="nav-link" href="/users"><i class="fas fa-fw fa-users-cog"></i><span>Manajemen Pengguna</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/audit-logs"><i class="fas fa-fw fa-history"></i><span>Log Audit</span></a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/settings"><i class="fas fa-fw fa-cogs"></i><span>Pengaturan Sistem</span></a>
+    </li>
+    {{end}}
+
+    <hr class="sidebar-divider">
+    <li class="nav-item">
+        <a class="nav-link" href="/panduan">
+            <i class="fas fa-fw fa-book-open"></i>
+            <span>Panduan Pengguna</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/tentang">
+            <i class="fas fa-fw fa-info-circle"></i>
+            <span>Tentang Aplikasi</span>
+        </a>
+    </li>
+
+</ul>

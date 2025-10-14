@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <title>SIMDOKPOL - {{ .Title }}</title>
+        <link
+            href="/static/vendor/fontawesome-free/css/all.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link href="/static/fonts/nunito.css" rel="stylesheet" />
+        <link href="/static/css/sb-admin-2.min.css" rel="stylesheet" />
+        <link
+            href="/static/vendor/sweetalert2/sweetalert2.min.css"
+            rel="stylesheet"
+        />
+        <link href="/static/css/custom.css" rel="stylesheet" />
+        <style>
+            .btn-login {
+                font-size: 0.9rem;
+                letter-spacing: 0.05rem;
+                padding: 0.85rem 1rem;
+                font-weight: 700;
+            }
+        </style>
+    </head>
+    <body class="bg-gradient-primary">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-6 col-lg-8 col-md-9">
+                    <div class="card o-hidden border-0 my-5">
+                        <div class="card-body p-0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="p-5">
+                                        <div class="text-center">
+                                            <img
+                                                src="/static/img/logo.png"
+                                                alt="Logo Polri"
+                                                style="
+                                                    max-width: 90px;
+                                                    margin-bottom: 1rem;
+                                                "
+                                            />
+
+                                            <h1 class="h4 text-gray-900 mb-1">
+                                                SIMDOKPOL
+                                            </h1>
+                                            <p class="mb-4 small text-gray-600">
+                                                Sistem Informasi Manajemen
+                                                Dokumen Kepolisian
+                                            </p>
+                                        </div>
+
+                                        <form class="user" id="login-form">
+                                            <div class="form-group">
+                                                <input
+                                                    type="text"
+                                                    class="form-control form-control-user"
+                                                    id="nrp"
+                                                    aria-describedby="nrpHelp"
+                                                    placeholder="Masukkan Nomor Registrasi Pokok (NRP)..."
+                                                    required
+                                                />
+                                            </div>
+                                            <div class="form-group password-wrapper">
+                                                <input
+                                                    type="password"
+                                                    class="form-control form-control-user"
+                                                    id="password"
+                                                    placeholder="Kata Sandi"
+                                                    required
+                                                />
+                                                <i class="fas fa-eye password-peek" id="togglePassword"></i>
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                class="btn btn-primary btn-user btn-block btn-login"
+                                            >
+                                                Login
+                                            </button>
+                                        </form>
+                                        <hr />
+                                        <div class="text-center">
+                                            <a class="small" href="#" id="forgot-password-link"
+                                                >Lupa Kata Sandi?</a
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <span class="text-white small"
+                            >Copyright &copy; SIMDOKPOL 2025</span
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/vendor/jquery/jquery.min.js"></script>
+        <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+        <script src="/static/js/sb-admin-2.min.js"></script>
+        <script src="/static/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+        {{template "_loginScript.html" .}}
+    </body>
+</html>

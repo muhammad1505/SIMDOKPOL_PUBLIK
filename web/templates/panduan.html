@@ -1,0 +1,116 @@
+{{template "_header.html" .}}
+{{template "_sidebar.html" .}}
+
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        {{template "_topbar.html" .}}
+        <div class="container-fluid">
+
+            <h1 class="h3 mb-4 text-gray-800">Panduan Pengguna Aplikasi SIMDOKPOL</h1>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Pendahuluan</h6>
+                </div>
+                <div class="card-body">
+                    <p>Selamat datang di Panduan Pengguna SIMDOKPOL (Sistem Informasi Manajemen Dokumen Kepolisian). Dokumen ini akan memandu Anda melalui semua fitur utama aplikasi, mulai dari setup awal hingga penggunaan sehari-hari.</p>
+                    <p>Panduan ini ditujukan untuk dua jenis pengguna:</p>
+                    <ul>
+                        <li><strong>Operator:</strong> Pengguna yang bertugas untuk mengelola surat keterangan.</li>
+                        <li><strong>Super Admin:</strong> Pengguna dengan hak akses penuh, termasuk mengelola pengguna lain dan pengaturan sistem.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">1. Memulai Aplikasi</h6>
+                </div>
+                <div class="card-body">
+                    <h5 class="font-weight-bold text-gray-800">1.1. Alur Setup Awal (Hanya untuk Penggunaan Pertama Kali)</h5>
+                    <p>Saat aplikasi dijalankan untuk pertama kalinya, Anda akan diarahkan ke halaman Setup. Halaman ini digunakan untuk mengonfigurasi detail dasar instansi Anda.</p>
+                    <ol>
+                        <li><strong>Langkah 1: Konfigurasi KOP Surat:</strong> Masukkan tiga baris teks yang akan digunakan sebagai kepala surat resmi.</li>
+                        <li><strong>Langkah 2: Informasi Instansi & Surat:</strong> Atur nama kantor, tempat penerbitan surat, dan nomor surat terakhir (jika melanjutkan dari sistem lama).</li>
+                        <li><strong>Langkah 3: Buat Akun Super Admin:</strong> Daftarkan akun Super Admin pertama yang akan digunakan untuk mengelola sistem.</li>
+                    </ol>
+                    <p class="mt-2">Setelah semua langkah selesai, klik "Simpan" dan Anda akan diarahkan ke halaman Login.</p>
+                    <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Halaman Setup multi-langkah]</p>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="font-weight-bold text-gray-800 mt-4">1.2. Halaman Login</h5>
+                    <p>Untuk masuk ke sistem, masukkan <strong>NRP</strong> dan <strong>Kata Sandi</strong> Anda, lalu klik tombol "Login".</p>
+                    <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Halaman Login aplikasi]</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">2. Manajemen Surat Keterangan</h6>
+                </div>
+                <div class="card-body">
+                    <p>Ini adalah fungsi inti dari aplikasi, dapat diakses melalui menu "Surat Keterangan" di sidebar.</p>
+                    <h5 class="font-weight-bold text-gray-800 mt-4">2.1. Membuat Surat Baru</h5>
+                    <ol>
+                        <li>Klik menu <strong>Surat Keterangan > Buat Surat Baru</strong>.</li>
+                        <li>Isi semua data pemohon pada form yang tersedia. Untuk tanggal lahir, akan muncul kalender interaktif.</li>
+                        <li>Klik tombol <strong>"Tambah Barang"</strong> untuk membuka modal dan memasukkan detail barang yang hilang.</li>
+                        <li>Pilih <strong>Penerima Laporan</strong> dan <strong>Penanggung Jawab</strong>. Sistem akan secara otomatis merekomendasikan petugas berdasarkan regu yang sedang login.</li>
+                        <li>Klik <strong>"Terbitkan Surat"</strong> untuk menyimpan dan menghasilkan nomor surat baru.</li>
+                    </ol>
+                    <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Halaman form pembuatan surat baru]</p>
+                    </div>
+
+                    <h5 class="font-weight-bold text-gray-800 mt-4">2.2. Daftar Dokumen & Tombol Aksi</h5>
+                    <p>Di halaman "Daftar Dokumen Aktif" atau "Arsip Dokumen", Anda akan melihat tabel berisi semua surat yang telah dibuat. Di kolom "Aksi", terdapat beberapa tombol. Arahkan kursor mouse ke salah satu tombol untuk melihat fungsinya:</p>
+                    <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Tabel daftar dokumen dengan tombol aksi]</p>
+                    </div>
+                    <ul>
+                        <li><span class="btn btn-sm btn-info"><i class="fas fa-print"></i></span> <strong>Cetak:</strong> Membuka halaman pratinjau cetak.</li>
+                        <li><span class="btn btn-sm btn-success"><i class="fas fa-copy"></i></span> <strong>Buat Ulang:</strong> Membuat surat baru dengan mengisi otomatis semua data dari surat lama. Sangat berguna untuk perpanjangan.</li>
+                        <li><span class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></span> <strong>Edit:</strong> Mengubah data pada surat yang sudah ada.</li>
+                        <li><span class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></span> <strong>Hapus:</strong> Menghapus surat (soft delete).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">3. Fitur Khusus Super Admin</h6>
+                </div>
+                <div class="card-body">
+                     <p>Menu-menu berikut hanya akan muncul di sidebar jika Anda login sebagai <strong>Super Admin</strong>.</p>
+                     
+                    <h5 class="font-weight-bold text-gray-800 mt-4">3.1. Manajemen Pengguna</h5>
+                    <p>Halaman ini memungkinkan Anda untuk mengelola semua akun pengguna. Anda bisa <strong>menambah</strong> pengguna baru, <strong>mengedit</strong> data pengguna yang ada, <strong>menonaktifkan</strong> akun, dan <strong>mengaktifkan</strong> kembali akun yang sebelumnya non-aktif melalui tab "Pengguna Non-Aktif".</p>
+                    <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Halaman Manajemen Pengguna]</p>
+                    </div>
+
+                    <h5 class="font-weight-bold text-gray-800 mt-4">3.2. Log Audit</h5>
+                    <p>Fitur ini merekam semua aktivitas penting yang terjadi di sistem. Ini berguna untuk melacak perubahan data dan siapa yang melakukannya. Informasi yang ditampilkan meliputi waktu, pengguna, aksi, dan detailnya.</p>
+                     <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Halaman Log Audit]</p>
+                    </div>
+
+                    <h5 class="font-weight-bold text-gray-800 mt-4">3.3. Backup & Restore</h5>
+                    <p>Fitur krusial untuk keamanan data. Anda dapat mengatur folder tujuan backup, melakukan backup untuk mengunduh database, dan melakukan restore dari file backup. <strong>Gunakan fitur restore dengan sangat hati-hati.</strong></p>
+                    <div class="text-center my-3 p-3 border rounded">
+                        <p class="font-italic">[Gambar: Halaman Backup & Restore]</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {{template "_footer.html" .}}
+</div>
+
+{{template "_scripts.html" .}}

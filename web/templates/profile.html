@@ -1,0 +1,83 @@
+{{template "_header.html" .}}
+{{template "_sidebar.html" .}}
+
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        {{template "_topbar.html" .}}
+        <div class="container-fluid">
+
+            <h1 class="h3 mb-4 text-gray-800">Profil Pengguna</h1>
+
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Informasi Profil</h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="profile-form">
+                                <div class="form-group">
+                                    <label for="profile_nama_lengkap">Nama Lengkap</label>
+                                    <input type="text" class="form-control auto-uppercase" id="profile_nama_lengkap" value="{{.CurrentUser.NamaLengkap}}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile_nrp">NRP</label>
+                                    <input type="text" class="form-control" id="profile_nrp" value="{{.CurrentUser.NRP}}" required>
+                                </div>
+                                 <div class="form-group">
+                                    <label for="profile_pangkat">Pangkat</label>
+                                    <input type="text" class="form-control auto-uppercase" id="profile_pangkat" value="{{.CurrentUser.Pangkat}}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Jabatan</label>
+                                    <input type="text" readonly class="form-control-plaintext" value="{{.CurrentUser.Jabatan}}">
+                                    <small class="form-text text-muted">Jabatan & Regu hanya dapat diubah oleh Super Admin.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Regu</label>
+                                    <input type="text" readonly class="form-control-plaintext" value="{{if .CurrentUser.Regu}}{{.CurrentUser.Regu}}{{else}}-{{end}}">
+                                </div>
+                                <hr>
+                                <button type="submit" class="btn btn-primary btn-block">Simpan Perubahan Profil</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Ubah Kata Sandi</h6>
+                        </div>
+                        <div class="card-body">
+                            <form id="change-password-form">
+                                <div class="form-group">
+                                    <label for="old_password">Kata Sandi Saat Ini</label>
+                                    <input type="password" class="form-control" id="old_password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new_password">Kata Sandi Baru</label>
+                                    <input type="password" class="form-control" id="new_password" required minlength="8">
+                                     <small class="form-text text-muted">Minimal 8 karakter.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm_password">Konfirmasi Kata Sandi Baru</label>
+                                    <input type="password" class="form-control" id="confirm_password" required>
+                                </div>
+                                <hr>
+                                <button type="submit" class="btn btn-primary btn-block">Simpan Perubahan Kata Sandi</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    {{template "_footer.html" .}}
+</div>
+
+{{template "_scripts.html" .}}
+{{template "_profileScript.html" .}}

@@ -1,0 +1,117 @@
+<script>
+$(document).ready(function() {
+    let usersTable;
+    let currentStatusFilter = 'active';
+
+    function loadUsersTable(status) {
+        if (usersTable) {
+            usersTable.destroy();
+        }
+
+        usersTable = $('#usersTable').DataTable({
+            "processing": true,
+            "serverSide": false,
+            "ajax": {
+                "url": `/api/users?status=${status}`,
+                "type": "GET",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": null, "render": (data, type, row, meta) => meta.row + 1 },
+                { "data": "nama_lengkap" },
+                { "data": "nrp" },
+                { "data": "pangkat" },
+                { "data": "jabatan" },
+                { "data": "regu", "render": (data) => data || '-' },
+                { "data": "peran", "render": (data) => `<span class="badge badge-info">${data}</span>` },
+                { 
+                    "data": "id",
+                    "render": function(data, type, row) {
+                        // --- PERUBAHAN: Membungkus caption dengan span ---
+                        let editButton = `<a href="/users/${data}/edit" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-edit"></i><span class="btn-caption">Edit</span></a>`;
+                        let actionButton;
+
+                        if (status === 'active') {
+                            actionButton = `<button type="button" class="btn btn-danger btn-sm deactivate-user-btn" data-id="${data}" data-name="${row.nama_lengkap}" title="Nonaktifkan"><i class="fas fa-user-slash"></i><span class="btn-caption">Nonaktifkan</span></button>`;
+                        } else {
+                            actionButton = `<button type="button" class="btn btn-success btn-sm activate-user-btn" data-id="${data}" data-name="${row.nama_lengkap}" title="Aktifkan"><i class="fas fa-user-check"></i><span class="btn-caption">Aktifkan</span></button>`;
+                        }
+                        return `<div class="btn-group" role="group">${editButton} ${actionButton}</div>`;
+                    }
+                }
+            ],
+            "language": { "url": "/static/vendor/datatables/Indonesian.json" },
+            // --- PERUBAHAN: Menghapus pengaturan lebar kolom ---
+            "columnDefs": [ 
+                { "orderable": false, "targets": [0, 7] }
+            ],
+        });
+    }
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        let target = $(e.target).attr("href");
+        currentStatusFilter = (target === '#active') ? 'active' : 'inactive';
+        loadUsersTable(currentStatusFilter);
+    });
+
+    loadUsersTable(currentStatusFilter);
+
+    $('#usersTable tbody').on('click', '.deactivate-user-btn', function() {
+        const userId = $(this).data('id');
+        const userName = $(this).data('name');
+        Swal.fire({
+            title: 'Nonaktifkan Pengguna?',
+            text: `Anda akan menonaktifkan: ${userName}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, nonaktifkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/api/users/${userId}`,
+                    method: 'DELETE',
+                    success: function(response) {
+                        Swal.fire('Berhasil!', 'Pengguna telah dinonaktifkan.', 'success');
+                        loadUsersTable(currentStatusFilter);
+                    },
+                    error: function(jqXHR) {
+                        Swal.fire('Gagal', 'Gagal menonaktifkan pengguna.', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    $('#usersTable tbody').on('click', '.activate-user-btn', function() {
+        const userId = $(this).data('id');
+        const userName = $(this).data('name');
+        Swal.fire({
+            title: 'Aktifkan Pengguna?',
+            text: `Anda akan mengaktifkan kembali: ${userName}`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, aktifkan!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/api/users/${userId}/activate`,
+                    method: 'POST',
+                    success: function(response) {
+                        Swal.fire('Berhasil!', 'Pengguna telah diaktifkan kembali.', 'success');
+                        loadUsersTable(currentStatusFilter);
+                    },
+                    error: function(jqXHR) {
+                        Swal.fire('Gagal', 'Gagal mengaktifkan pengguna.', 'error');
+                    }
+                });
+            }
+        });
+    });
+});
+</script>

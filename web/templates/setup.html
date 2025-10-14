@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <title>SIMDOKPOL - {{ .Title }}</title>
+        <link
+            href="/static/vendor/fontawesome-free/css/all.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <link href="/static/fonts/nunito.css" rel="stylesheet" />
+        <link href="/static/css/sb-admin-2.min.css" rel="stylesheet" />
+        <link
+            href="/static/vendor/sweetalert2/sweetalert2.min.css"
+            rel="stylesheet"
+        />
+        <link href="/static/css/custom.css" rel="stylesheet" />
+    </head>
+    <body class="bg-gradient-primary">
+        <div class="container">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-10 mx-auto">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">
+                                        Konfigurasi Awal Aplikasi
+                                    </h1>
+                                    <p>
+                                        Selamat datang! Silakan lakukan
+                                        pengaturan awal sebelum menggunakan
+                                        aplikasi.
+                                    </p>
+                                </div>
+                                <form id="setup-form">
+                                    <div
+                                        class="stepper-slide active"
+                                        id="slide-1"
+                                    >
+                                        <hr />
+                                        <h5 class="mb-3 text-gray-800">
+                                            Langkah 1 dari 3: Konfigurasi Instansi
+                                        </h5>
+                                        <div class="card shadow-sm mb-4">
+                                            <div class="card-header">
+                                                Kop Surat & Nama Instansi
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control auto-uppercase"
+                                                        id="kop_baris_1"
+                                                        placeholder="Baris 1 KOP (Contoh: KEPOLISIAN NEGARA REPUBLIK INDONESIA)"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div class="form-group">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control auto-uppercase"
+                                                        id="kop_baris_2"
+                                                        placeholder="Baris 2 KOP (Contoh: DAERAH SULAWESI TENGAH)"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div class="form-group">
+                                                    <input
+                                                        type="text"
+                                                        class="form-control auto-uppercase"
+                                                        id="kop_baris_3"
+                                                        placeholder="Baris 3 KOP (Contoh: RESOR MOROWALI)"
+                                                        required
+                                                    />
+                                                </div>
+                                                <hr>
+                                                <div class="form-row">
+                                                    <div
+                                                        class="form-group col-md-6"
+                                                    >
+                                                        <label for="nama_kantor"
+                                                            >Nama Kantor Pelayanan</label
+                                                        ><input
+                                                            type="text"
+                                                            class="form-control auto-titlecase"
+                                                            id="nama_kantor"
+                                                            placeholder="Contoh: Polsek Bahodopi"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div
+                                                        class="form-group col-md-6"
+                                                    >
+                                                        <label
+                                                            for="tempat_surat"
+                                                            >Tempat Penerbitan
+                                                            Surat</label
+                                                        ><input
+                                                            type="text"
+                                                            class="form-control auto-titlecase"
+                                                            id="tempat_surat"
+                                                            placeholder="Contoh: Bahodopi"
+                                                            required
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary btn-user btn-block next-step"
+                                        >
+                                            Lanjut
+                                        </button>
+                                    </div>
+
+                                    <div class="stepper-slide" id="slide-2">
+                                        <hr />
+                                        <h5 class="mb-3 text-gray-800">
+                                            Langkah 2 dari 3: Konfigurasi Dokumen
+                                        </h5>
+                                        <div class="card shadow-sm mb-4">
+                                            <div class="card-header">
+                                                Penomoran & Aturan Lain
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="format_nomor_surat">Format Nomor Surat</label>
+                                                    <input type="text" class="form-control" id="format_nomor_surat" value="SKH/%d/%s/TUK.7.2.1/%d" required />
+                                                    <small class="form-text text-muted">Gunakan %d untuk nomor urut, %s untuk bulan romawi, dan %d untuk tahun.</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="nomor_surat_terakhir">Nomor Terakhir (Tahun Ini)</label>
+                                                    <input type="number" class="form-control" id="nomor_surat_terakhir" value="0" required />
+                                                    <small class="form-text text-muted">Isi jika melanjutkan penomoran dari sistem lama. Jika memulai dari awal, biarkan 0.</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="archive_duration_days">Durasi Dokumen Aktif (Hari)</label>
+                                                    <input type="number" class="form-control" id="archive_duration_days" value="15" required />
+                                                    <small class="form-text text-muted">Setelah durasi ini, dokumen akan dianggap sebagai arsip.</small>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="zona_waktu">Zona Waktu</label>
+                                                    <select id="zona_waktu" class="form-control" required >
+                                                        <option value="Asia/Jakarta">WIB (Asia/Jakarta)</option>
+                                                        <option value="Asia/Makassar" selected>WITA (Asia/Makassar)</option>
+                                                        <option value="Asia/Jayapura">WIT (Asia/Jayapura)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between" >
+                                            <button type="button" class="btn btn-secondary btn-user prev-step">Kembali</button>
+                                            <button type="button" class="btn btn-primary btn-user next-step">Lanjut</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="stepper-slide" id="slide-3">
+                                        <hr />
+                                        <h5 class="mb-3 text-gray-800">
+                                            Langkah 3 dari 3: Buat Akun Super
+                                            Admin
+                                        </h5>
+                                        <div class="card shadow-sm mb-4">
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label for="admin_nama_lengkap">Nama Lengkap</label>
+                                                    <input type="text" class="form-control auto-uppercase" id="admin_nama_lengkap" required />
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="admin_nrp">NRP</label>
+                                                        <input type="text" class="form-control" id="admin_nrp" required />
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="admin_pangkat">Pangkat</label>
+                                                        <input type="text" class="form-control auto-uppercase" id="admin_pangkat" required />
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="admin_password">Kata Sandi</label>
+                                                        <div class="password-wrapper">
+                                                            <input type="password" class="form-control" id="admin_password" required minlength="8" />
+                                                            <i class="fas fa-eye password-peek" id="togglePassword"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="admin_password_confirm">Konfirmasi Kata Sandi</label>
+                                                        <div class="password-wrapper">
+                                                            <input type="password" class="form-control" id="admin_password_confirm" required />
+                                                            <i class="fas fa-eye password-peek" id="togglePasswordConfirm"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-secondary btn-user prev-step">Kembali</button>
+                                            <button type="submit" class="btn btn-primary btn-user">Simpan Konfigurasi & Buat Akun</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="/static/vendor/jquery/jquery.min.js"></script>
+        <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/static/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+        {{template "_setupScript.html" .}}
+    </body>
+</html>

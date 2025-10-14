@@ -1,0 +1,125 @@
+<script>
+$(document).ready(function() {
+    // --- FUNGSI HELPERS (TIDAK BERUBAH) ---
+    function toTitleCase(str) { return str.replace(/\w\S*/g, function(txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); }); }
+    $('body').on('input', '.auto-uppercase', function() { $(this).val($(this).val().toUpperCase()); });
+    $('body').on('input', '.auto-titlecase', function() { $(this).val(toTitleCase($(this).val())); });
+    
+    // --- FUNGSI INTIP PASSWORD (DIPERBARUI) ---
+    $('#togglePassword').on('click', function() {
+        const password = $('#kata_sandi');
+        const type = password.attr('type') === 'password' ? 'text' : 'password';
+        password.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // --- PENAMBAHAN EVENT LISTENER UNTUK KONFIRMASI PASSWORD ---
+    $('#togglePasswordConfirm').on('click', function() {
+        const password = $('#kata_sandi_konfirmasi');
+        const type = password.attr('type') === 'password' ? 'text' : 'password';
+        password.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    const isEdit = {{.IsEdit}};
+    const userID = {{.UserID}};
+
+    function populateForm(data) {
+        $('#nama_lengkap').val(data.nama_lengkap);
+        $('#nrp').val(data.nrp);
+        $('#pangkat').val(data.pangkat);
+        $('#peran').val(data.peran);
+        $('#jabatan').val(data.jabatan);
+        $('#regu').val(data.regu);
+    }
+
+    if (isEdit) {
+        $('#form-title').text('Edit Data Pengguna');
+        $('#submit-btn').text('Simpan Perubahan');
+        $('#passwordHelp').show();
+
+        $.ajax({
+            url: `/api/users/${userID}`,
+            method: 'GET',
+            success: populateForm,
+            error: function() { 
+                Swal.fire('Error', 'Gagal memuat data pengguna.', 'error').then(() => {
+                    window.location.href = '/users';
+                });
+            }
+        });
+    } else {
+        $('#kata_sandi').prop('required', true);
+        $('#kata_sandi_konfirmasi').prop('required', true);
+    }
+
+    $('#user-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        // --- LOGIKA VALIDASI PASSWORD DIPERBARUI DI SINI ---
+        let password = $('#kata_sandi').val();
+        let confirmPassword = $('#kata_sandi_konfirmasi').val();
+
+        if (password !== confirmPassword) {
+            Swal.fire('Error', 'Konfirmasi kata sandi tidak cocok!', 'error');
+            return;
+        }
+
+        if (!isEdit && (!password || password.length < 8)) {
+            Swal.fire('Perhatian', 'Kata sandi wajib diisi minimal 8 karakter untuk pengguna baru.', 'warning');
+            return;
+        }
+        if (isEdit && password && password.length < 8) {
+            Swal.fire('Perhatian', 'Kata sandi baru minimal 8 karakter.', 'warning');
+            return;
+        }
+        // --- AKHIR DARI LOGIKA VALIDASI ---
+
+        const formData = {
+            nama_lengkap: $('#nama_lengkap').val(),
+            nrp: $('#nrp').val(),
+            pangkat: $('#pangkat').val(),
+            peran: $('#peran').val(),
+            jabatan: $('#jabatan').val(),
+            regu: $('#regu').val(),
+            kata_sandi: password,
+        };
+
+        let ajaxSettings = {
+            url: '/api/users',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Pengguna baru berhasil ditambahkan.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => { window.location.href = '/users'; });
+            },
+            error: function(jqXHR) {
+                const errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.error : 'Terjadi kesalahan.';
+                Swal.fire('Gagal', errorMsg, 'error');
+            }
+        };
+
+        if (isEdit) {
+            ajaxSettings.url = `/api/users/${userID}`;
+            ajaxSettings.method = 'PUT';
+            ajaxSettings.success = function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Data pengguna berhasil diperbarui.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => { window.location.href = '/users'; });
+            };
+        }
+
+        $.ajax(ajaxSettings);
+    });
+});
+</script>

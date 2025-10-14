@@ -1,0 +1,55 @@
+<script>
+$(document).ready(function() {
+    $('#auditLogsTable').DataTable({
+        "processing": true,
+        "serverSide": false, // Data dimuat sekali di client-side
+        "ajax": {
+            "url": "/api/audit-logs",
+            "type": "GET",
+            "dataSrc": "" // Sumber data adalah array JSON langsung
+        },
+        "columns": [
+            { 
+                "data": "Timestamp",
+                "render": function(data) {
+                    // Format tanggal menjadi lebih mudah dibaca
+                    return new Date(data).toLocaleString('id-ID', {
+                        year: 'numeric', month: 'long', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    });
+                }
+            },
+            { 
+                "data": "User",
+                "render": function(data) {
+                    // Jika ada data pengguna, tampilkan nama. Jika tidak (misal: aksi sistem), tampilkan 'SISTEM'
+                    return data ? data.nama_lengkap : '<span class="font-italic text-muted">SISTEM</span>';
+                }
+            },
+            { 
+                "data": "Aksi",
+                "render": function(data) {
+                    // Beri warna pada label Aksi
+                    let badgeClass = 'badge-secondary';
+                    if (data.includes('BUAT') || data.includes('AKTIFKAN')) {
+                        badgeClass = 'badge-success';
+                    } else if (data.includes('UPDATE')) {
+                        badgeClass = 'badge-warning';
+                    } else if (data.includes('HAPUS') || data.includes('NONAKTIFKAN')) {
+                        badgeClass = 'badge-danger';
+                    }
+                    return `<span class="badge ${badgeClass}">${data}</span>`;
+                }
+            },
+            { "data": "Detail" }
+        ],
+        "order": [[ 0, "desc" ]], // Urutkan berdasarkan waktu, yang terbaru di atas
+        "language": { "url": "/static/vendor/datatables/Indonesian.json" },
+        "columnDefs": [ 
+            { "width": "20%", "targets": 0 },
+            { "width": "15%", "targets": 1 },
+            { "width": "15%", "targets": 2 }
+        ],
+    });
+});
+</script>

@@ -1,0 +1,76 @@
+{{template "_header.html" .}}
+{{template "_sidebar.html" .}}
+
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        {{template "_topbar.html" .}}
+        <div class="container-fluid">
+
+            <h1 class="h3 mb-4 text-gray-800">Tentang Aplikasi SIMDOKPOL</h1>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Sistem Informasi Manajemen Dokumen Kepolisian</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <img class="img-fluid px-3 px-sm-4 mt-3 mb-4" style="width: 10rem;" src="/static/img/logo.png" alt="Logo Polri">
+                    </div>
+                    <p><strong>Versi:</strong> 1.0.0</p>
+                    <p>
+                        SIMDOKPOL adalah sebuah aplikasi web yang dirancang untuk membantu unit kepolisian dalam manajemen dan penerbitan surat keterangan secara efisien, cepat, dan aman. Aplikasi ini dibangun dengan arsitektur modern dan dapat berjalan sepenuhnya secara offline tanpa memerlukan koneksi internet.
+                    </p>
+                    
+                    <hr>
+
+                    <h5><strong>Fitur Unggulan:</strong></h5>
+                    <ul>
+                        <li>Manajemen Dokumen dan Pengguna yang komprehensif.</li>
+                        <li>Dasbor analitik untuk pemantauan data secara real-time.</li>
+                        <li>Formulir cerdas dengan sistem rekomendasi petugas.</li>
+                        <li>Konfigurasi sistem yang dinamis melalui alur setup terpandu.</li>
+                        <li>Modul Audit Log untuk melacak semua aktivitas penting.</li>
+                        <li>Fitur Backup & Restore database dengan path yang bisa diatur.</li>
+                        <li>Pratinjau cetak dengan presisi tinggi sesuai format fisik.</li>
+                    </ul>
+
+                    <hr>
+
+                    <h5><strong>Tumpukan Teknologi:</strong></h5>
+                    <ul>
+                        <li><strong>Backend:</strong> Go (Golang) dengan framework Gin</li>
+                        <li><strong>Database:</strong> SQLite</li>
+                        <li><strong>Frontend:</strong> HTML, CSS, JavaScript dengan jQuery & Bootstrap</li>
+                    </ul>
+
+                    <hr>
+                    <h5><strong>Profil Pengembang</strong></h5>
+                    <p>
+                        [Deskripsikan secara singkat profil Anda atau instansi Anda di sini. Jelaskan latar belakang dan tujuan pembuatan aplikasi ini. Anda bisa menambahkan beberapa paragraf jika perlu.]
+                    </p>
+                    
+                    <hr>
+                    <h5><strong>Kontak</strong></h5>
+                    <p>Untuk dukungan teknis, laporan bug, atau permintaan fitur, silakan hubungi melalui:</p>
+                    <ul>
+                        <li><strong>Email:</strong> [emailanda@contoh.com]</li>
+                        <li><strong>Telepon/WhatsApp:</strong> [Nomor HP Anda]</li>
+                        <li><strong>Website:</strong> [Alamat website atau profil LinkedIn/GitHub Anda]</li>
+                    </ul>
+
+
+                    <hr>
+
+                    <div class="text-center mt-4">
+                        <p class="small">Dikembangkan oleh [Nama Pengembang/Instansi Anda]</p>
+                        <p class="small">Copyright &copy; SIMDOKPOL 2025</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {{template "_footer.html" .}}
+</div>
+
+{{template "_scripts.html" .}}

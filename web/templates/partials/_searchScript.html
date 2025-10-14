@@ -1,0 +1,115 @@
+<script>
+$(document).ready(function() {
+    let dataTableInstance;
+    const $table = $('#documentsTable');
+    const currentUserID = $table.data('current-user-id');
+    const currentUserPeran = $table.data('current-user-peran');
+
+    function loadSearchResults() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q');
+
+        if (query) {
+            $('#page-title').text(`Hasil Pencarian untuk: "${query}"`);
+            $('#global-search-input').val(query);
+        } else {
+            $('#page-title').text('Pencarian Kosong');
+            $('#page-description').text('Silakan masukkan kata kunci di kotak pencarian di atas.');
+            return;
+        }
+
+        var tableBody = $('#documentsTable tbody');
+        let apiUrl = '/api/search?q=' + encodeURIComponent(query);
+        
+        if (dataTableInstance) {
+            dataTableInstance.destroy();
+        }
+        tableBody.html('<tr><td colspan="7" class="text-center">Mencari data...</td></tr>');
+        
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            success: function(data) {
+                tableBody.empty();
+                if (!data || data.length === 0) {
+                    tableBody.html('<tr><td colspan="7" class="text-center">Tidak ada dokumen yang cocok ditemukan.</td></tr>');
+                    return;
+                }
+                
+                $.each(data, function(index, doc) {
+                    var reportDate = new Date(doc.tanggal_laporan).toLocaleDateString('id-ID', {
+                        day: '2-digit', month: 'long', year: 'numeric'
+                    });
+                    var statusBadge;
+                    if (doc.status === 'DIARSIPKAN') {
+                        statusBadge = `<span class="badge badge-secondary">${doc.status}</span>`;
+                    } else {
+                        statusBadge = `<span class="badge badge-success">${doc.status}</span>`;
+                    }
+                    const isOwner = doc.operator && doc.operator.id === currentUserID;
+                    const isAdmin = currentUserPeran === 'SUPER_ADMIN';
+                    const canPerformAction = isOwner || isAdmin;
+                    
+                    var actions = `
+                        <div class="btn-group" role="group">
+                            <a href="${canPerformAction ? '/documents/' + doc.id + '/print' : '#'}" class="btn btn-info btn-sm ${!canPerformAction ? 'disabled' : ''}" title="Cetak"><i class="fas fa-print"></i><span class="btn-caption">Cetak</span></a>
+                            <a href="${canPerformAction ? '/documents/new?duplicate_from=' + doc.id : '#'}" class="btn btn-success btn-sm ${!canPerformAction ? 'disabled' : ''}" title="Buat Ulang"><i class="fas fa-copy"></i><span class="btn-caption">Buat Ulang</span></a>
+                            <a href="${canPerformAction ? '/documents/' + doc.id + '/edit' : '#'}" class="btn btn-warning btn-sm ${!canPerformAction ? 'disabled' : ''}" title="Edit"><i class="fas fa-edit"></i><span class="btn-caption">Edit</span></a>
+                            <button type="button" class="btn btn-danger btn-sm delete-btn" 
+                                    data-id="${doc.id}" 
+                                    data-number="${doc.nomor_surat}" 
+                                    title="Hapus" ${!canPerformAction ? 'disabled' : ''}>
+                                <i class="fas fa-trash"></i><span class="btn-caption">Hapus</span>
+                            </button>
+                        </div>
+                    `;
+
+                    var row = '<tr><td>' + (index + 1) + '</td><td>' + doc.nomor_surat + '</td><td>' + (doc.resident ? doc.resident.nama_lengkap : 'N/A') + '</td><td>' + reportDate + '</td><td>' + statusBadge + '</td><td>' + (doc.operator ? doc.operator.nama_lengkap : 'N/A') + '</td><td>' + actions + '</td></tr>';
+                    tableBody.append(row);
+                });
+
+                dataTableInstance = $('#documentsTable').DataTable({
+                    "language": { "url": "/static/vendor/datatables/Indonesian.json" },
+                    "columnDefs": [ { "orderable": false, "targets": [0, 6] } ],
+                });
+            },
+            error: function() {
+                tableBody.html('<tr><td colspan="7" class="text-center">Gagal melakukan pencarian.</td></tr>');
+            }
+        });
+    }
+
+    $('#documentsTable').on('click', '.delete-btn', function() {
+        if ($(this).is(':disabled')) { return; }
+        var docId = $(this).data('id');
+        var docNumber = $(this).data('number');
+        
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: `Anda akan menghapus surat dengan nomor: ${docNumber}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/api/documents/' + docId,
+                    method: 'DELETE',
+                    success: function(response) {
+                        Swal.fire('Dihapus!', 'Dokumen berhasil dihapus.', 'success');
+                        loadSearchResults();
+                    },
+                    error: function(jqXHR) {
+                        Swal.fire('Gagal Menghapus', (jqXHR.responseJSON ? jqXHR.responseJSON.error : 'Error tidak diketahui'), 'error');
+                    }
+                });
+            }
+        });
+    });
+    
+    loadSearchResults();
+});
+</script>

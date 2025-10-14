@@ -1,0 +1,25 @@
+<script>
+$(document).ready(function() {
+    
+    // Script ini sekarang hanya bertugas memuat statistik untuk kartu
+    function loadStats() {
+        $.ajax({
+            url: '/api/stats',
+            method: 'GET',
+            success: function(stats) {
+                $('#stats-monthly').text(stats.docs_monthly);
+                $('#stats-yearly').text(stats.docs_yearly);
+                $('#stats-today').text(stats.docs_today);
+                $('#stats-users').text(stats.active_users);
+            },
+            error: function() {
+                $('.h5.mb-0.font-weight-bold.text-gray-800').text('Error');
+            }
+        });
+    }
+
+    // Panggil fungsi saat halaman siap
+    loadStats();
+
+});
+</script>

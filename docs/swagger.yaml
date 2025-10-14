@@ -1,0 +1,990 @@
+basePath: /api
+definitions:
+  controllers.ChangePasswordRequest:
+    properties:
+      confirm_password:
+        example: password_baru123
+        type: string
+      new_password:
+        example: password_baru123
+        minLength: 8
+        type: string
+      old_password:
+        example: password_lama123
+        type: string
+    required:
+    - confirm_password
+    - new_password
+    - old_password
+    type: object
+  controllers.CreateUserRequest:
+    properties:
+      jabatan:
+        example: ANGGOTA JAGA REGU
+        type: string
+      kata_sandi:
+        example: password123
+        minLength: 8
+        type: string
+      nama_lengkap:
+        example: NAMA LENGKAP PETUGAS
+        type: string
+      nrp:
+        example: "98765"
+        type: string
+      pangkat:
+        example: BRIPDA
+        type: string
+      peran:
+        enum:
+        - OPERATOR
+        - SUPER_ADMIN
+        type: string
+      regu:
+        example: I
+        type: string
+    required:
+    - jabatan
+    - kata_sandi
+    - nama_lengkap
+    - nrp
+    - pangkat
+    - peran
+    type: object
+  controllers.DocumentRequest:
+    properties:
+      agama:
+        example: Islam
+        type: string
+      alamat:
+        example: JL. MERDEKA NO. 10, JAKARTA
+        type: string
+      items:
+        items:
+          properties:
+            deskripsi:
+              example: 'NIK: 3171234567890001'
+              type: string
+            nama_barang:
+              example: KTP
+              type: string
+          required:
+          - nama_barang
+          type: object
+        minItems: 1
+        type: array
+      jenis_kelamin:
+        enum:
+        - Laki-laki
+        - Perempuan
+        type: string
+      lokasi_hilang:
+        example: Sekitar Pasar Senen
+        type: string
+      nama_lengkap:
+        example: BUDI SANTOSO
+        type: string
+      pejabat_persetuju_id:
+        example: 1
+        type: integer
+      pekerjaan:
+        example: Karyawan Swasta
+        type: string
+      petugas_pelapor_id:
+        example: 2
+        type: integer
+      tanggal_lahir:
+        example: "1990-01-15"
+        type: string
+      tempat_lahir:
+        example: JAKARTA
+        type: string
+    required:
+    - agama
+    - alamat
+    - items
+    - jenis_kelamin
+    - lokasi_hilang
+    - nama_lengkap
+    - pejabat_persetuju_id
+    - pekerjaan
+    - petugas_pelapor_id
+    - tanggal_lahir
+    - tempat_lahir
+    type: object
+  controllers.LoginRequest:
+    properties:
+      nrp:
+        example: "12345"
+        type: string
+      password:
+        example: password123
+        type: string
+    required:
+    - nrp
+    - password
+    type: object
+  controllers.UpdateProfileRequest:
+    properties:
+      nama_lengkap:
+        example: NAMA SAYA
+        type: string
+      nrp:
+        example: "12345"
+        type: string
+      pangkat:
+        example: BRIPKA
+        type: string
+    required:
+    - nama_lengkap
+    - nrp
+    - pangkat
+    type: object
+  dto.AppConfig:
+    properties:
+      archive_duration_days:
+        type: integer
+      backup_path:
+        type: string
+      format_nomor_surat:
+        type: string
+      is_setup_complete:
+        type: boolean
+      kop_baris_1:
+        type: string
+      kop_baris_2:
+        type: string
+      kop_baris_3:
+        type: string
+      nama_kantor:
+        type: string
+      nomor_surat_terakhir:
+        type: string
+      tempat_surat:
+        type: string
+      zona_waktu:
+        type: string
+    type: object
+  models.AuditLog:
+    properties:
+      aksi:
+        type: string
+      detail:
+        type: string
+      id:
+        type: integer
+      timestamp:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+      userID:
+        type: integer
+    type: object
+  models.LostDocument:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      last_updated_by:
+        $ref: '#/definitions/models.User'
+      last_updated_by_id:
+        description: LastUpdatedByID adalah pengguna yang login dan melakukan aksi
+          Update terakhir
+        type: integer
+      lokasi_hilang:
+        type: string
+      lost_items:
+        items:
+          $ref: '#/definitions/models.LostItem'
+        type: array
+      nomor_surat:
+        type: string
+      operator:
+        $ref: '#/definitions/models.User'
+      operator_id:
+        description: |-
+          --- FIELD BARU UNTUK AUDIT ---
+          Operator adalah pengguna yang login dan melakukan aksi Create
+        type: integer
+      pejabat_persetuju:
+        $ref: '#/definitions/models.User'
+      pejabat_persetuju_id:
+        type: integer
+      petugas_pelapor:
+        $ref: '#/definitions/models.User'
+      petugas_pelapor_id:
+        description: Petugas yang namanya akan tercetak di surat
+        type: integer
+      resident:
+        $ref: '#/definitions/models.Resident'
+      resident_id:
+        type: integer
+      status:
+        type: string
+      tanggal_laporan:
+        type: string
+      tanggal_persetujuan:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.LostItem:
+    properties:
+      deskripsi:
+        type: string
+      id:
+        type: integer
+      lost_document_id:
+        type: integer
+      nama_barang:
+        type: string
+    type: object
+  models.Resident:
+    properties:
+      agama:
+        type: string
+      alamat:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      jenis_kelamin:
+        type: string
+      nama_lengkap:
+        type: string
+      nik:
+        type: string
+      pekerjaan:
+        type: string
+      tanggal_lahir:
+        type: string
+      tempat_lahir:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      jabatan:
+        description: KANIT SPKT, ANGGOTA JAGA REGU
+        type: string
+      nama_lengkap:
+        type: string
+      nrp:
+        type: string
+      pangkat:
+        type: string
+      peran:
+        description: SUPER_ADMIN, OPERATOR
+        type: string
+      regu:
+        description: I, II, III
+        type: string
+      updated_at:
+        type: string
+    type: object
+  services.ChartDataDTO:
+    properties:
+      data:
+        items:
+          type: integer
+        type: array
+      labels:
+        items:
+          type: string
+        type: array
+    type: object
+  services.DashboardStatsDTO:
+    properties:
+      active_users:
+        type: integer
+      docs_monthly:
+        type: integer
+      docs_today:
+        type: integer
+      docs_yearly:
+        type: integer
+    type: object
+  services.PieChartDataDTO:
+    properties:
+      background_colors:
+        items:
+          type: string
+        type: array
+      data:
+        items:
+          type: integer
+        type: array
+      labels:
+        items:
+          type: string
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: yusuf.aar@gmail.com
+    name: MUHAMMAD YUSUF ABDURROHMAN
+    url: https://github.com/dope-s/simdokpol-go
+  description: Ini adalah dokumentasi API untuk aplikasi Sistem Informasi Manajemen
+    Dokumen Kepolisian.
+  license:
+    name: MIT License
+    url: https://github.com/dope-s/simdokpol-go/blob/main/LICENSE
+  termsOfService: http://swagger.io/terms/
+  title: SIMDOKPOL API
+  version: "1.0"
+paths:
+  /audit-logs:
+    get:
+      description: Mengambil seluruh riwayat aktivitas yang tercatat di sistem. Hanya
+        bisa diakses oleh Super Admin.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AuditLog'
+            type: array
+        "500":
+          description: 'Error: Gagal mengambil data log audit'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Semua Log Audit
+      tags:
+      - Audit Log
+  /backups:
+    post:
+      description: Membuat salinan database saat ini dan mengirimkannya sebagai file
+        unduhan. Hanya bisa diakses oleh Super Admin.
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: File backup database (.db)
+          schema:
+            type: file
+        "500":
+          description: 'Error: Gagal memproses backup'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Membuat Backup Database
+      tags:
+      - Backup & Restore
+  /documents:
+    get:
+      description: Mengambil daftar semua surat keterangan hilang, bisa difilter berdasarkan
+        status (aktif/arsip) dan query pencarian.
+      parameters:
+      - description: Kata Kunci Pencarian (No. Surat / Nama)
+        in: query
+        name: q
+        type: string
+      - default: active
+        description: Filter status dokumen
+        enum:
+        - active
+        - archived
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.LostDocument'
+            type: array
+        "500":
+          description: 'Error: Terjadi kesalahan pada server'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Semua Dokumen
+      tags:
+      - Documents
+    post:
+      consumes:
+      - application/json
+      description: Membuat surat keterangan hilang baru.
+      parameters:
+      - description: Data Dokumen Baru
+        in: body
+        name: document
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.DocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.LostDocument'
+        "400":
+          description: 'Error: Input tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Gagal membuat dokumen'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Membuat Dokumen Baru
+      tags:
+      - Documents
+  /documents/{id}:
+    delete:
+      description: Menghapus (soft delete) sebuah surat keterangan hilang. Hanya bisa
+        diakses oleh Super Admin atau operator yang membuatnya.
+      parameters:
+      - description: ID Dokumen
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pesan Sukses
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'Error: ID tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: 'Error: Akses ditolak'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Gagal menghapus dokumen'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Menghapus Dokumen
+      tags:
+      - Documents
+    get:
+      description: Mengambil detail satu surat keterangan hilang berdasarkan ID-nya.
+        Hanya bisa diakses oleh Super Admin atau operator yang membuat dokumen tersebut.
+      parameters:
+      - description: ID Dokumen
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LostDocument'
+        "400":
+          description: 'Error: ID tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: 'Error: Akses ditolak'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: 'Error: Dokumen tidak ditemukan'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Dokumen Berdasarkan ID
+      tags:
+      - Documents
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data sebuah surat keterangan hilang. Hanya bisa diakses
+        oleh Super Admin atau operator yang membuatnya.
+      parameters:
+      - description: ID Dokumen
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Data Dokumen yang Diperbarui
+        in: body
+        name: document
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.DocumentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LostDocument'
+        "400":
+          description: 'Error: Input tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: 'Error: Akses ditolak'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Gagal memperbarui dokumen'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Memperbarui Dokumen
+      tags:
+      - Documents
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Melakukan otentikasi pengguna berdasarkan NRP dan kata sandi, lalu
+        mengembalikan token JWT dalam HttpOnly cookie.
+      parameters:
+      - description: Data Login Pengguna
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'Contoh: {\"message\": \"Login berhasil\"}'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'Contoh: {\"error\": \"NRP dan Kata Sandi diperlukan\"}'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: 'Contoh: {\"error\": \"NRP atau kata sandi salah\"}'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login Pengguna
+      tags:
+      - Authentication
+  /notifications/expiring-documents:
+    get:
+      description: Mengambil daftar dokumen yang akan segera masuk masa arsip untuk
+        pengguna yang sedang login.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.LostDocument'
+            type: array
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Notifikasi Dokumen Kedaluwarsa
+      tags:
+      - Dashboard & Stats
+  /profile:
+    put:
+      consumes:
+      - application/json
+      description: Memperbarui data profil (Nama, NRP, Pangkat) untuk pengguna yang
+        sedang login.
+      parameters:
+      - description: Data Profil Baru
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pesan sukses dan data user yang diperbarui
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: 'Error: Input tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Terjadi kesalahan pada server'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Memperbarui Profil Pengguna
+      tags:
+      - Profile
+  /profile/password:
+    put:
+      consumes:
+      - application/json
+      description: Mengubah kata sandi untuk pengguna yang sedang login.
+      parameters:
+      - description: Data Kata Sandi Lama dan Baru
+        in: body
+        name: passwords
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pesan Sukses
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'Error: Input tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: 'Error: Kata sandi lama salah'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mengubah Kata Sandi Pengguna
+      tags:
+      - Profile
+  /restore:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Memulihkan database dari file .db yang diunggah. Semua data saat
+        ini akan ditimpa. Hanya bisa diakses oleh Super Admin.
+      parameters:
+      - description: File backup .db yang akan di-restore
+        in: formData
+        name: restore-file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pesan Sukses
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'Error: Input tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Gagal memulihkan database'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Melakukan Restore Database
+      tags:
+      - Backup & Restore
+  /search:
+    get:
+      description: Mencari dokumen (aktif dan arsip) berdasarkan Nomor Surat atau
+        Nama Pemohon.
+      parameters:
+      - description: Kata Kunci Pencarian
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.LostDocument'
+            type: array
+        "500":
+          description: 'Error: Terjadi kesalahan pada server'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Pencarian Dokumen Global
+      tags:
+      - Documents
+  /settings:
+    get:
+      description: Mengambil semua data konfigurasi sistem yang sedang aktif. Hanya
+        bisa diakses oleh Super Admin.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.AppConfig'
+        "500":
+          description: 'Error: Gagal mengambil data pengaturan'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Semua Pengaturan Sistem
+      tags:
+      - Settings
+    put:
+      consumes:
+      - application/json
+      description: Menyimpan satu atau lebih data konfigurasi sistem. Hanya bisa diakses
+        oleh Super Admin.
+      parameters:
+      - description: Data Pengaturan Baru
+        in: body
+        name: settings
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AppConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pesan Sukses
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: 'Error: Format data tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Gagal menyimpan pengaturan'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Memperbarui Pengaturan Sistem
+      tags:
+      - Settings
+  /stats:
+    get:
+      description: Mengambil data statistik utama untuk kartu-kartu di dasbor (laporan
+        hari ini, bulan ini, tahun ini, dan total pengguna).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.DashboardStatsDTO'
+        "500":
+          description: 'Error: Gagal mengambil data statistik'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Statistik Utama Dasbor
+      tags:
+      - Dashboard & Stats
+  /stats/item-composition:
+    get:
+      description: Mengambil data label dan jumlah untuk grafik pai komposisi barang
+        hilang di dasbor.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.PieChartDataDTO'
+        "500":
+          description: 'Error: Gagal mengambil data komposisi barang'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Data Komposisi Barang
+      tags:
+      - Dashboard & Stats
+  /stats/monthly-issuance:
+    get:
+      description: Mengambil data label dan jumlah penerbitan surat per bulan untuk
+        grafik area di dasbor.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.ChartDataDTO'
+        "500":
+          description: 'Error: Gagal mengambil data grafik'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Data Grafik Bulanan
+      tags:
+      - Dashboard & Stats
+  /users:
+    get:
+      description: Mengambil daftar semua pengguna (aktif atau non-aktif). Hanya bisa
+        diakses oleh Super Admin.
+      parameters:
+      - default: active
+        description: Filter status pengguna
+        enum:
+        - active
+        - inactive
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "500":
+          description: 'Error: Gagal mengambil data pengguna'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Mendapatkan Semua Pengguna
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Membuat akun pengguna baru (Operator atau Super Admin). Hanya bisa
+        diakses oleh Super Admin.
+      parameters:
+      - description: Data Pengguna Baru
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: 'Error: Input tidak valid'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: 'Error: Terjadi kesalahan pada server'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Membuat Pengguna Baru
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: Masukkan token JWT Anda dengan format 'Bearer {token}'.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

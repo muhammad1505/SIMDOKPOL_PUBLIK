@@ -1,0 +1,69 @@
+<script>
+$(document).ready(function() {
+    
+    $('#togglePassword').on('click', function() {
+        const password = $('#password');
+        const type = password.attr('type') === 'password' ? 'text' : 'password';
+        password.attr('type', type);
+        $(this).toggleClass('fa-eye fa-eye-slash');
+    });
+
+    // === BLOK BARU: LOGIKA LUPA KATA SANDI ===
+    $('#forgot-password-link').on('click', function(e) {
+        e.preventDefault(); // Mencegah link berpindah halaman
+        Swal.fire({
+            icon: 'info',
+            title: 'Prosedur Reset Kata Sandi',
+            text: 'Untuk mereset kata sandi Anda, silakan hubungi Super Admin yang bertugas.',
+            confirmButtonText: 'Saya Mengerti'
+        });
+    });
+    // === AKHIR BLOK BARU ===
+
+    $('#nrp, #password').on('input', function() {
+        $('#error-message').hide();
+    });
+
+    $('#login-form').on('submit', function(e) {
+        e.preventDefault(); 
+
+        const nrp = $('#nrp').val();
+        const password = $('#password').val();
+        const $submitButton = $(this).find('button[type="submit"]');
+        const originalButtonText = $submitButton.html();
+
+        if (!nrp || !password) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Input Tidak Lengkap',
+                text: 'NRP dan Kata Sandi tidak boleh kosong.',
+            });
+            return;
+        }
+
+        $submitButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...').prop('disabled', true);
+
+        $.ajax({
+            url: '/api/login',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                nrp: nrp,
+                password: password
+            }),
+            success: function(response) {
+                window.location.href = '/';
+            },
+            error: function(jqXHR) {
+                const errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.error : 'Terjadi kesalahan. Silakan coba lagi.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Gagal',
+                    text: errorMsg,
+                });
+                $submitButton.html(originalButtonText).prop('disabled', false);
+            }
+        });
+    });
+});
+</script>

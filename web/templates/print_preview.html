@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pratinjau Cetak - {{ .Document.NomorSurat }}</title>
+        <script src="/static/vendor/tailwindcss/tailwind.min.js"></script>
+        <link href="/static/css/custom.css" rel="stylesheet" />
+        <style>
+            body {
+                font-family: "Courier New", Courier, monospace;
+                line-height: 1.15;
+                color: #000;
+                font-size: 11pt;
+            }
+            .container-A4 {
+                width: 210mm;
+                min-height: 297mm;
+                padding: 1.5cm;
+                margin: 1rem auto;
+                border: 1px #d1d5db solid;
+                background: white;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            }
+            .content-table td {
+                padding: 0;
+                vertical-align: top;
+            }
+            .toolbar {
+                width: 210mm;
+                margin: 1rem auto;
+                padding: 10px;
+                text-align: center;
+                background-color: #333;
+                border-radius: 5px;
+            }
+            .toolbar button,
+            .toolbar a {
+                padding: 8px 16px;
+                margin: 0 10px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                text-decoration: none;
+                font-family: sans-serif;
+            }
+            .toolbar a.back {
+                background-color: #6c757d;
+            }
+
+            @media print {
+                body,
+                .container-A4 {
+                    margin: 0;
+                    box-shadow: none;
+                    border: none;
+                }
+                .toolbar {
+                    display: none;
+                }
+                @page {
+                    size: A4;
+                    margin: 1.27cm;
+                }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-100">
+        <div class="toolbar">
+            <button onclick="window.print()">
+                Cetak Langsung (atau Simpan sebagai PDF)
+            </button>
+            <a class="back" href="/documents">Kembali ke Daftar</a>
+        </div>
+
+        <div class="container-A4">
+            <header>
+                <table class="w-full">
+                    <tbody>
+                        <tr>
+                            <td class="w-[40%] align-top leading-tight">
+                                <p class="font-bold text-xs" align="center">
+                                    {{ .Config.KopBaris1 }}
+                                </p>
+                                <p class="font-bold text-xs" align="center">
+                                    {{ .Config.KopBaris2 }}
+                                </p>
+                                <p
+                                    class="font-bold text-xs border-b-2 border-black"
+                                    align="center"
+                                >
+                                    {{ .Config.KopBaris3 }}
+                                </p>
+                            </td>
+                            <td class="w-[60%]"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </header>
+
+            <div class="text-center my-1">
+                <img
+                    src="/static/img/logo.png"
+                    alt="Logo Polri"
+                    class="mx-auto mb-1"
+                    style="width: 50px; height: auto"
+                />
+                <p class="underline font-bold text-sm tracking-wider">
+                    SURAT KETERANGAN HILANG
+                </p>
+                <p class="text-xs">Nomor: {{ .Document.NomorSurat }}</p>
+            </div>
+
+            <div>
+                <p class="text-justify indent-8">
+                    ---- Yang bertanda tangan dibawah ini A.n. KEPALA KEPOLISIAN
+                    {{ .Config.KopBaris3| ToUpper }}, Menerangkan dengan benar
+                    bahwa :
+                </p>
+
+                <div class="mt-1 ml-8">
+                    <table class="w-full content-table">
+                        <tbody>
+                            <tr>
+                                <td style="width: 150px">Nama</td>
+                                <td>
+                                    :
+                                    <span class="font-bold pl-2"
+                                        >{{ .Document.Resident.NamaLengkap |
+                                        ToUpper }}</span
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>TTL</td>
+                                <td>
+                                    :
+                                    <span class="pl-2"
+                                        >{{ .Document.Resident.TempatLahir }},
+                                        {{
+                                        .Document.Resident.TanggalLahir.Format
+                                        "02-01-2006" }}</span
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Agama</td>
+                                <td>
+                                    :
+                                    <span class="pl-2"
+                                        >{{ .Document.Resident.Agama }}</span
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jenis kelamin</td>
+                                <td>
+                                    :
+                                    <span class="pl-2"
+                                        >{{ .Document.Resident.JenisKelamin
+                                        }}</span
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Pekerjaan</td>
+                                <td>
+                                    :
+                                    <span class="pl-2"
+                                        >{{ .Document.Resident.Pekerjaan
+                                        }}</span
+                                    >
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Alamat</td>
+                                <td>
+                                    :
+                                    <span class="pl-2"
+                                        >{{ .Document.Resident.Alamat }}</span
+                                    >
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-1">
+                    <p class="text-justify indent-8">
+                        Yang bersangkutan tersebut di atas benar telah datang di
+                        Kantor {{ .Config.NamaKantor }} dan melaporkan bahwa
+                        telah kehilangan surat berharga berupa :
+                    </p>
+                </div>
+
+                <div class="mt-1 ml-8 space-y-0">
+                    {{range .Document.LostItems}}
+                    <p>
+                        - 1 (Satu) Buah {{ .NamaBarang }} Dengan Keterangan : {{
+                        .Deskripsi }} A.n Pelapor
+                    </p>
+                    {{end}}
+                </div>
+
+                <div class="mt-1">
+                    <p class="text-justify indent-8">
+                        ---- Surat/kartu tersebut hilang di sekitar {{
+                        .Document.LokasiHilang }}, dan sudah dilakukan pencarian
+                        namun sampai dikeluarkan Surat Keterangan ini belum
+                        ditemukan.
+                    </p>
+                </div>
+
+                <div class="mt-3 grid grid-cols-2 gap-4">
+                    <div></div>
+                    <div class="text-center">
+                        <p>Yang Bermohon</p>
+                        <div class="h-10"></div>
+                        <p class="font-bold underline">
+                            {{ .Document.Resident.NamaLengkap | ToUpper }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-1">
+                    <p class="text-justify indent-8">
+                        ----- Demikian Surat Keterangan ini dibuat dengan
+                        sebenar-benarnya dan dapat dipergunakan sebagaimana
+                        perlunya.
+                    </p>
+                </div>
+
+                <div class="mt-1">
+                    <p class="underline font-bold">Tindakan Yang Diambil :</p>
+                    <ol class="list-decimal list-outside ml-6">
+                        <li>
+                            Menerima laporan dan membuat Surat Keterangan
+                            Kehilangan barang guna seperlunya;
+                        </li>
+                        <li>
+                            Surat keterangan kehilangan ini berlaku selama 15
+                            (lima belas) hari, berlaku mulai tanggal
+                            dikeluarkan;
+                        </li>
+                        <li>
+                            Surat Keterangan ini bukan sebagai pengganti surat
+                            yang hilang tetapi berguna untuk mengurus kembali
+                            surat yang hilang.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="mt-2 text-xs">
+                <div class="grid grid-cols-2 gap-4">
+                    <div></div>
+                    <div class="text-center">
+                        <p>
+                            {{ .Config.TempatSurat }}, {{
+                            .Document.TanggalLaporan.Format "02 January 2006" }}
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mt-1">
+                    <div class="text-center">
+                        <p class="text-sm">
+                            a.n. KEPALA {{ .Config.NamaKantor | ToUpper }}
+                        </p>
+                        <p class="text-sm">
+                            {{ .Document.PejabatPersetuju.Jabatan }} {{
+                            .Document.PejabatPersetuju.Regu }}
+                        </p>
+                        <div class="h-10"></div>
+                        <p class="font-bold underline text-sm">
+                            {{ .Document.PejabatPersetuju.NamaLengkap | ToUpper
+                            }}
+                        </p>
+                        <p class="text-sm">
+                            {{ .Document.PejabatPersetuju.Pangkat }} / NRP {{
+                            .Document.PejabatPersetuju.NRP }}
+                        </p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-sm">Penerima Laporan</p>
+                        <p class="text-sm">
+                            {{ .Document.PetugasPelapor.Jabatan }} {{
+                            .Document.PetugasPelapor.Regu }}
+                        </p>
+                        <div class="h-10"></div>
+                        <p class="font-bold underline text-sm">
+                            {{ .Document.PetugasPelapor.NamaLengkap | ToUpper }}
+                        </p>
+                        <p class="text-sm">
+                            {{ .Document.PetugasPelapor.Pangkat }} / NRP {{
+                            .Document.PetugasPelapor.NRP }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

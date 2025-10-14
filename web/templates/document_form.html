@@ -1,0 +1,126 @@
+{{template "_header.html" .}}
+{{template "_sidebar.html" .}}
+
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        {{template "_topbar.html" .}}
+        <div class="container-fluid">
+            <h1 class="h3 mb-4 text-gray-800" id="form-title">Formulir Surat Keterangan Hilang</h1>
+            
+            <form id="create-doc-form" 
+                data-current-user-id="{{.CurrentUser.ID}}" 
+                data-current-user-regu="{{.CurrentUser.Regu}}"
+                data-current-user-jabatan="{{.CurrentUser.Jabatan}}">
+
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Data Pemohon</h6></div>
+                    <div class="card-body">
+                        <div class="form-group"><label for="nama_lengkap">Nama Lengkap</label><input type="text" class="form-control auto-titlecase" id="nama_lengkap" name="nama_lengkap" required></div>
+                        <div class="form-row">
+                             <div class="form-group col-md-6"><label for="tempat_lahir">Tempat Lahir</label><input type="text" class="form-control auto-titlecase" id="tempat_lahir" name="tempat_lahir" required></div>
+                            <div class="form-group col-md-6">
+                                <label for="tanggal_lahir">Tanggal Lahir</label>
+                                <input type="text" class="form-control" id="tanggal_lahir" name="tanggal_lahir" placeholder="DD-MM-YYYY" autocomplete="off" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4"><label for="jenis_kelamin">Jenis Kelamin</label><select id="jenis_kelamin" name="jenis_kelamin" class="form-control" required><option selected value="">Pilih...</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
+                            <div class="form-group col-md-4"><label for="agama">Agama</label><select id="agama" name="agama" class="form-control" required><option selected value="">Pilih...</option><option>Islam</option><option>Kristen Protestan</option><option>Kristen Katolik</option><option>Hindu</option><option>Buddha</option><option>Khonghucu</option></select></div>
+                             <div class="form-group col-md-4"><label for="pekerjaan">Pekerjaan</label><select id="pekerjaan" name="pekerjaan" class="form-control" required><option selected value="">Pilih...</option><option>Belum/Tidak Bekerja</option><option>Pelajar/Mahasiswa</option><option>Pegawai Negeri Sipil</option><option>Karyawan Swasta</option><option>Wiraswasta</option><option>Mengurus Rumah Tangga</option><option>Lainnya</option></select></div>
+                        </div>
+                        <div class="form-group"><label for="alamat">Alamat Lengkap</label><textarea class="form-control auto-titlecase" id="alamat" name="alamat" rows="3" required></textarea></div>
+                    </div>
+                </div>
+                
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Barang Hilang</h6>
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#addItemModal">Tambah Barang</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive"><table class="table table-bordered" id="lost-items-table"><thead><tr><th style="width: 5%;">No.</th><th>Nama Barang</th><th>Deskripsi</th><th style="width: 5%;">Aksi</th></tr></thead><tbody></tbody></table></div>
+                        <div class="form-group mt-3"><label for="lokasi_hilang">Perkiraan Lokasi Hilang</label><input type="text" class="form-control auto-titlecase" id="lokasi_hilang" name="lokasi_hilang" placeholder="Contoh: Sekitar Pasar Bahodopi" required></div>
+                    </div>
+                </div>
+
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Petugas Terlibat</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="penerima_laporan">Penerima Laporan</label>
+                                <select id="penerima_laporan" class="form-control" required><option value="">Memuat...</option></select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="penanggung_jawab">Penanggung Jawab (Pejabat Persetuju)</label>
+                                <select id="penanggung_jawab" class="form-control" required><option value="">Memuat...</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mb-4">
+                    <a href="/documents" class="btn btn-secondary mr-2">Batal</a>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Terbitkan Surat</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {{template "_footer.html" .}}
+</div>
+
+<div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title" id="addItemModalLabel">Tambah Barang Hilang</h5><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
+            <div class="modal-body">
+                <form id="modal-item-form">
+                    <div class="form-group">
+                        <label for="modal_item_type">Jenis Barang</label>
+                        <select class="form-control" id="modal_item_type"><option value="">Pilih Jenis Barang...</option><option value="KTP">KTP</option><option value="SIM">SIM</option><option value="STNK">STNK</option><option value="BPKB">BPKB</option><option value="IJAZAH">Ijazah</option><option value="ATM">Kartu ATM / Buku Tabungan</option><option value="LAINNYA">Lainnya...</option></select>
+                    </div>
+                    <div id="dynamic-fields-container">
+                        <div class="conditional-fields" id="fields-ktp" style="display: none;">
+                            <div class="form-group"><label>NIK</label><input type="text" class="form-control numeric-only" data-label="NIK"><div class="invalid-feedback">Input harus berupa angka.</div></div>
+                        </div>
+                        <div class="conditional-fields" id="fields-sim" style="display: none;">
+                            <div class="form-group"><label>Golongan SIM</label><select class="form-control" data-label="Gol"><option>A</option><option>B I</option><option>B II</option><option>C</option><option>D</option></select></div>
+                            <div class="form-group"><label>Nomor SIM</label><input type="text" class="form-control numeric-only" data-label="No. SIM"><div class="invalid-feedback">Input harus berupa angka.</div></div>
+                        </div>
+                        <div class="conditional-fields" id="fields-kendaraan" style="display: none;">
+                            <div class="form-group"><label>Nomor Polisi</label><input type="text" class="form-control auto-uppercase" data-label="No. Pol"></div>
+                            <div class="form-group"><label>Nomor Rangka</label><input type="text" class="form-control auto-uppercase" data-label="No. Rangka"></div>
+                            <div class="form-group"><label>Nomor Mesin</label><input type="text" class="form-control auto-uppercase" data-label="No. Mesin"></div>
+                        </div>
+                         <div class="conditional-fields" id="fields-bpkb" style="display: none;">
+                            <div class="form-group"><label>Nomor BPKB</label><input type="text" class="form-control auto-uppercase" data-label="No. BPKB"></div>
+                            <div class="form-group"><label>Atas Nama</label><input type="text" class="form-control auto-titlecase" id="bpkb_atas_nama" data-label="a.n."></div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="bpkb_nama_sama"><label class="form-check-label" for="bpkb_nama_sama">Sama dengan nama pelapor</label></div>
+                        </div>
+                        <div class="conditional-fields" id="fields-ijazah" style="display: none;">
+                            <div class="form-group"><label>Tingkat Ijazah</label><select class="form-control" data-label="Tingkat"><option>SD</option><option>SMP</option><option>SMA/SMK</option><option>D3</option><option>S1</option><option>S2</option><option>S3</option></select></div>
+                            <div class="form-group"><label>Nomor Ijazah</label><input type="text" class="form-control" data-label="No. Ijazah"></div>
+                        </div>
+                        <div class="conditional-fields" id="fields-bank" style="display: none;">
+                             <div class="form-group"><label>Nama Bank</label><select class="form-control" data-label="Bank"><option>BRI</option><option>BCA</option><option>Mandiri</option><option>BNI</option><option>BTN</option><option>Lainnya</option></select></div>
+                             <div class="form-group"><label>Nomor Rekening</label><input type="text" class="form-control numeric-only" data-label="No. Rek"><div class="invalid-feedback">Input harus berupa angka.</div></div>
+                        </div>
+                        <div class="conditional-fields" id="fields-lainnya" style="display: none;">
+                             <div class="form-group"><label>Nama Barang</label><input type="text" class="form-control auto-titlecase" id="lainnya_nama_barang"></div>
+                             <div class="form-group"><label>Deskripsi</label><textarea class="form-control" id="lainnya_deskripsi" rows="2"></textarea></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" id="save-item-btn" class="btn btn-primary">Simpan Barang</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{template "_scripts.html" .}}
+{{template "_documentFormScript.html" .}}

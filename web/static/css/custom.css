@@ -1,0 +1,189 @@
+/* Stepper/Slider styles for setup page */
+.stepper-slide {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+
+.stepper-slide.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper .form-control {
+    padding-right: 3rem;
+}
+
+.password-wrapper .password-peek {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    cursor: pointer;
+    color: #6e707e;
+    z-index: 5;
+}
+
+table.dataTable td .btn {
+    white-space: nowrap;
+}
+
+/* --- ATURAN BARU DI SINI: Untuk Caption Tombol Hover --- */
+.btn .btn-caption {
+    /* Kondisi default: tersembunyi */
+    max-width: 0;
+    opacity: 0;
+    overflow: hidden;
+    /* Efek transisi saat muncul/hilang */
+    transition:
+        max-width 0.3s ease-out,
+        opacity 0.2s ease-out,
+        margin-left 0.3s ease-out;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.btn:hover .btn-caption {
+    /* Kondisi saat hover: muncul */
+    max-width: 150px; /* Lebar maksimal yang cukup untuk semua caption */
+    opacity: 1;
+    margin-left: 0.3rem; /* Beri sedikit spasi antara ikon dan teks */
+}
+
+/*
+=================================================================
+  METRO UI OVERRIDE FOR SB ADMIN 2 THEME
+  Tujuan: Menghilangkan sudut melengkung, bayangan, dan gradien
+  untuk menciptakan tampilan yang flat, bersih, dan modern.
+=================================================================
+*/
+
+/* 1. Global Reset: Menghilangkan Sudut Melengkung & Bayangan secara Umum
+-------------------------------------------------------------------- */
+/* Komponen utama yang direset */
+.card,
+.btn,
+.form-control,
+.dropdown-menu,
+.modal-content,
+.badge,
+.alert,
+.sidebar,
+.sidebar .nav-item .collapse .collapse-inner,
+.sidebar .nav-item .collapsing .collapse-inner {
+    border-radius: 0 !important;
+}
+
+/* Menghilangkan semua bayangan (box-shadow) */
+.card,
+.dropdown-menu,
+.modal-content,
+.topbar {
+    box-shadow: none !important;
+}
+
+/* 2. Penyesuaian Komponen Spesifik
+-------------------------------------------------------------------- */
+
+/* Kartu (Card) */
+.card {
+    border: 1px solid #e3e6f0; /* Memberi garis tegas pengganti bayangan */
+}
+
+/* Tombol (Button) */
+.btn {
+    transition: filter 0.15s ease-in-out;
+}
+.btn:hover {
+    /* Memberi efek visual pengganti bayangan saat hover */
+    filter: brightness(90%);
+}
+
+/* Lencana (Badge) */
+.badge {
+    /* Sedikit radius agar tidak terlalu kaku dan tetap terbaca */
+    border-radius: 2px !important;
+    font-weight: 500;
+}
+
+/* Topbar (Bilah Atas) */
+.topbar {
+    border-bottom: 1px solid #e3e6f0;
+}
+
+/* Sidebar (Bilah Samping) */
+.sidebar {
+    border-right: 1px solid #e3e6f0;
+}
+.sidebar .nav-item .nav-link {
+    /* Membuat ikon dan teks lebih tajam */
+    font-weight: 500;
+}
+.sidebar .sidebar-brand .sidebar-brand-text {
+    letter-spacing: 0.05em;
+}
+
+/* Formulir (Form) */
+.form-control {
+    border-radius: 0 !important;
+}
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25); /* Tetap pertahankan focus ring */
+}
+
+/* Tabel (DataTables) */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 0 !important;
+}
+
+/* Modal (Dialog Pop-up) */
+.modal-header,
+.modal-footer {
+    border-color: #e3e6f0;
+}
+
+/* 3. Tipografi & Tampilan Umum
+-------------------------------------------------------------------- */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+    /* Membuat font judul lebih tegas */
+    font-weight: 600;
+}
+
+/* 4. Perbaikan Kecil untuk Halaman Login Tema Metro
+-------------------------------------------------------------------- */
+/* Menghilangkan sisa bayangan dari card login */
+.card.o-hidden.border-0.shadow-lg {
+    box-shadow: none !important;
+    border: 1px solid #e3e6f0;
+}

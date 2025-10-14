@@ -1,0 +1,215 @@
+<script>
+    $(document).ready(function () {
+        // Event listener untuk auto-casing
+        $("body").on("input", ".auto-uppercase", function () {
+            $(this).val($(this).val().toUpperCase());
+        });
+        $("body").on("input", ".auto-titlecase", function () {
+            $(this).val(toTitleCase($(this).val()));
+        });
+        function toTitleCase(str) {
+            return str.replace(
+                /\w\S*/g,
+                txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+            );
+        }
+
+        // --- FUNGSI: Memuat semua pengaturan ke dalam form ---
+        function loadSettings() {
+            $.ajax({
+                url: "/api/settings",
+                method: "GET",
+                success: function (s) {
+                    // 's' adalah singkatan dari settings
+                    if (!s) return;
+                    $("#kop_baris_1").val(s.kop_baris_1);
+                    $("#kop_baris_2").val(s.kop_baris_2);
+                    $("#kop_baris_3").val(s.kop_baris_3);
+                    $("#nama_kantor").val(s.nama_kantor);
+                    $("#tempat_surat").val(s.tempat_surat);
+                    $("#format_nomor_surat").val(s.format_nomor_surat);
+                    $("#nomor_surat_terakhir").val(s.nomor_surat_terakhir);
+                    $("#zona_waktu").val(s.zona_waktu);
+                    $("#archive_duration_days").val(s.archive_duration_days);
+                    $("#backup_path").val(s.backup_path);
+                },
+                error: function () {
+                    Swal.fire(
+                        "Error",
+                        "Gagal memuat data pengaturan sistem.",
+                        "error"
+                    );
+                }
+            });
+        }
+        loadSettings();
+
+        // --- EVENT HANDLER: Menyimpan semua pengaturan ---
+        $("#settings-form").on("submit", function (e) {
+            e.preventDefault();
+            const $btn = $(this).find('button[type="submit"]');
+            const originalText = $btn.text();
+
+            const settingsData = {
+                kop_baris_1: $("#kop_baris_1").val(),
+                kop_baris_2: $("#kop_baris_2").val(),
+                kop_baris_3: $("#kop_baris_3").val(),
+                nama_kantor: $("#nama_kantor").val(),
+                tempat_surat: $("#tempat_surat").val(),
+                format_nomor_surat: $("#format_nomor_surat").val(),
+                nomor_surat_terakhir: $("#nomor_surat_terakhir").val(),
+                zona_waktu: $("#zona_waktu").val(),
+                archive_duration_days: $("#archive_duration_days").val(),
+                backup_path: $("#backup_path").val()
+            };
+
+            $btn.prop("disabled", true).html(
+                '<span class="spinner-border spinner-border-sm"></span> Menyimpan...'
+            );
+
+            $.ajax({
+                url: "/api/settings",
+                method: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(settingsData),
+                success: function (response) {
+                    Swal.fire("Berhasil!", response.message, "success");
+                },
+                error: function (jqXHR) {
+                    const errorMsg = jqXHR.responseJSON
+                        ? jqXHR.responseJSON.error
+                        : "Terjadi kesalahan.";
+                    Swal.fire("Gagal!", errorMsg, "error");
+                },
+                complete: function () {
+                    $btn.prop("disabled", false).text(originalText);
+                }
+            });
+        });
+
+        // --- LOGIKA UNTUK BACKUP & RESTORE (DIPINDAHKAN KE SINI) ---
+        $("#backup-btn").on("click", function () {
+            /* ... Logika backup tetap sama seperti di _backupRestoreScript.html ... */
+        });
+        $("#restore-form").on("submit", function (e) {
+            /* ... Logika restore tetap sama seperti di _backupRestoreScript.html ... */
+        });
+
+        // (Saya salin ulang logika backup & restore di bawah ini agar lengkap)
+        $("#backup-btn").on("click", function () {
+            const $btn = $(this);
+            Swal.fire({
+                title: "Mulai Proses Backup?",
+                text: "Sistem akan membuat salinan database dan Anda akan diminta untuk mengunduhnya.",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Lakukan Backup!",
+                cancelButtonText: "Batal"
+            }).then(result => {
+                if (result.isConfirmed) {
+                    $btn.prop("disabled", true).html(
+                        '<span class="spinner-border spinner-border-sm"></span> Memproses...'
+                    );
+                    fetch("/api/backups", { method: "POST" })
+                        .then(async res => {
+                            if (!res.ok) {
+                                const errorData = await res.json();
+                                throw new Error(
+                                    errorData.error ||
+                                        "Gagal membuat file backup."
+                                );
+                            }
+                            const disposition = res.headers.get(
+                                "Content-Disposition"
+                            );
+                            let filename = `backup-simdokpol.db`;
+                            if (disposition) {
+                                const filenameRegex =
+                                    /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                                const matches = filenameRegex.exec(disposition);
+                                if (matches != null && matches[1])
+                                    filename = matches[1].replace(/['"]/g, "");
+                            }
+                            return res
+                                .blob()
+                                .then(blob => ({ blob, filename }));
+                        })
+                        .then(({ blob, filename }) => {
+                            const a = document.createElement("a");
+                            a.href = window.URL.createObjectURL(blob);
+                            a.download = filename;
+                            a.click();
+                            a.remove();
+                            Swal.fire(
+                                "Berhasil!",
+                                "File backup berhasil diunduh.",
+                                "success"
+                            );
+                        })
+                        .catch(err => Swal.fire("Gagal!", err.message, "error"))
+                        .finally(() =>
+                            $btn
+                                .prop("disabled", false)
+                                .html(
+                                    '<span class="icon text-white-50"><i class="fas fa-download"></i></span><span class="text"> Backup Database Sekarang</span>'
+                                )
+                        );
+                }
+            });
+        });
+        $("#restore-form").on("submit", function (e) {
+            e.preventDefault();
+            const fileInput = $("#restore-file")[0];
+            if (fileInput.files.length === 0) {
+                Swal.fire(
+                    "Perhatian!",
+                    "Silakan pilih file backup terlebih dahulu.",
+                    "warning"
+                );
+                return;
+            }
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("restore-file", file);
+            Swal.fire({
+                title: "APAKAH ANDA YAKIN?",
+                html: `Anda akan menimpa seluruh data saat ini dengan file <strong>${file.name}</strong>.<br><br><strong class="text-danger">AKSI INI TIDAK DAPAT DIBATALKAN!</strong><br><br>Ketik "PULIHKAN" untuk konfirmasi.`,
+                icon: "warning",
+                input: "text",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Pulihkan Sekarang!",
+                cancelButtonText: "Batal",
+                showLoaderOnConfirm: true,
+                preConfirm: confirmationText => {
+                    if (confirmationText !== "PULIHKAN") {
+                        Swal.showValidationMessage(
+                            'Harap ketik "PULIHKAN" untuk melanjutkan.'
+                        );
+                        return false;
+                    }
+                    return fetch("/api/restore", {
+                        method: "POST",
+                        body: formData
+                    }).then(async response => {
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(
+                                errorData.error || "Gagal melakukan restore."
+                            );
+                        }
+                        return response.json();
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then(result => {
+                if (result.isConfirmed) {
+                    Swal.fire(
+                        "Restore Berhasil!",
+                        "Database telah berhasil dipulihkan. Aplikasi akan dimuat ulang.",
+                        "success"
+                    ).then(() => window.location.reload());
+                }
+            });
+        });
+    });
+</script>

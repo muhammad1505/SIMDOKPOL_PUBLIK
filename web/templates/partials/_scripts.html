@@ -1,0 +1,43 @@
+</div>
+</div>
+</div>
+<a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
+
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="/static/js/sb-admin-2.min.js"></script>
+
+<script src="/static/vendor/chart.js/Chart.min.js"></script>
+<script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<script src="/static/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+<script src="/static/vendor/datepicker/js/bootstrap-datepicker.min.js"></script>
+<script src="/static/vendor/datepicker/locales/bootstrap-datepicker.id.min.js"></script>
+
+
+<script>
+$(document).ready(function() {
+    $('#logout-btn').on('click', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/api/logout',
+            type: 'POST',
+            success: function(response) {
+                window.location.href = '/login';
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Gagal untuk logout. Silakan coba lagi.',
+                });
+            }
+        });
+    });
+});
+</script>
+
+</body>
+</html>

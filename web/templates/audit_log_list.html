@@ -1,0 +1,43 @@
+{{template "_header.html" .}}
+{{template "_sidebar.html" .}}
+
+<div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+        {{template "_topbar.html" .}}
+        <div class="container-fluid">
+
+            <h1 class="h3 mb-2 text-gray-800">Log Audit Sistem</h1>
+            <p class="mb-4">Halaman ini menampilkan rekaman semua aktivitas penting yang terjadi di dalam sistem.</p>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Riwayat Aktivitas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="auditLogsTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Pengguna (Aktor)</th>
+                                    <th>Aksi</th>
+                                    <th>Detail Aktivitas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="text-center">Memuat data log...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {{template "_footer.html" .}}
+</div>
+
+{{template "_scripts.html" .}}
+{{template "_auditLogListScript.html" .}}

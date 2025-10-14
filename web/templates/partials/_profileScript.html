@@ -1,0 +1,109 @@
+<script>
+$(document).ready(function() {
+    // Event listener untuk auto-uppercase
+    $('body').on('input', '.auto-uppercase', function() {
+        $(this).val($(this).val().toUpperCase());
+    });
+    
+    // === BLOK BARU: LOGIKA UPDATE PROFIL ===
+    $('#profile-form').on('submit', function(e) {
+        e.preventDefault();
+
+        const namaLengkap = $('#profile_nama_lengkap').val();
+        const nrp = $('#profile_nrp').val();
+        const pangkat = $('#profile_pangkat').val();
+        const $submitButton = $(this).find('button[type="submit"]');
+        const originalButtonText = $submitButton.html();
+
+        $submitButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...').prop('disabled', true);
+
+        $.ajax({
+            url: '/api/profile',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                nama_lengkap: namaLengkap,
+                nrp: nrp,
+                pangkat: pangkat,
+            }),
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: response.message,
+                });
+                // Update nama di topbar jika berubah
+                $('#userDropdown .small').text(response.user.nama_lengkap);
+            },
+            error: function(jqXHR) {
+                const errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.error : 'Terjadi kesalahan.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: errorMsg,
+                });
+            },
+            complete: function() {
+                $submitButton.html(originalButtonText).prop('disabled', false);
+            }
+        });
+    });
+
+    // === BLOK LAMA: LOGIKA UBAH PASSWORD (TIDAK BERUBAH) ===
+    $('#change-password-form').on('submit', function(e) {
+        e.preventDefault();
+
+        const oldPassword = $('#old_password').val();
+        const newPassword = $('#new_password').val();
+        const confirmPassword = $('#confirm_password').val();
+        const $submitButton = $(this).find('button[type="submit"]');
+        const originalButtonText = $submitButton.html();
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            Swal.fire('Perhatian', 'Semua kolom wajib diisi.', 'warning');
+            return;
+        }
+        if (newPassword.length < 8) {
+            Swal.fire('Perhatian', 'Kata sandi baru minimal harus 8 karakter.', 'warning');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            Swal.fire('Error', 'Konfirmasi kata sandi baru tidak cocok!', 'error');
+            return;
+        }
+
+        $submitButton.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...').prop('disabled', true);
+
+        $.ajax({
+            url: '/api/profile/password',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                old_password: oldPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword
+            }),
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: response.message,
+                }).then(() => {
+                    $('#change-password-form')[0].reset();
+                });
+            },
+            error: function(jqXHR) {
+                const errorMsg = jqXHR.responseJSON ? jqXHR.responseJSON.error : 'Terjadi kesalahan. Silakan coba lagi.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: errorMsg,
+                });
+            },
+            complete: function() {
+                $submitButton.html(originalButtonText).prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
