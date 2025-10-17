@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
-	_ "simdokpol/internal/models" // <-- PERBAIKAN: Ditambahkan blank identifier '_'
 	"simdokpol/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +27,8 @@ func NewAuditLogController(service services.AuditLogService) *AuditLogController
 func (c *AuditLogController) FindAll(ctx *gin.Context) {
 	logs, err := c.service.FindAll()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data log audit"})
+		log.Printf("ERROR: Gagal mengambil data log audit: %v", err)
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data log audit")
 		return
 	}
 	ctx.JSON(http.StatusOK, logs)

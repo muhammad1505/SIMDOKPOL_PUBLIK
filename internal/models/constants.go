@@ -6,6 +6,12 @@ const (
 	RoleOperator   = "OPERATOR"
 )
 
+// Konstanta untuk Status Dokumen
+const (
+	StatusDiterbitkan = "DITERBITKAN"
+	StatusDiarsipkan  = "DIARSIPKAN"
+)
+
 // Konstanta untuk Aksi Audit Log
 const (
 	AuditCreateUser      = "BUAT PENGGUNA"

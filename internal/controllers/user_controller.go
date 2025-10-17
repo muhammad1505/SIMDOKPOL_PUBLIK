@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"simdokpol/internal/models"
@@ -64,15 +65,11 @@ type UpdateProfileRequest struct {
 func (c *UserController) UpdateProfile(ctx *gin.Context) {
 	var req UpdateProfileRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Input tidak valid: " + err.Error()})
+		APIError(ctx, http.StatusBadRequest, "Input tidak valid: "+err.Error())
 		return
 	}
 
-	userID, exists := ctx.Get("userID")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Pengguna tidak terautentikasi."})
-		return
-	}
+	userID := ctx.GetUint("userID")
 
 	dataToUpdate := &models.User{
 		NamaLengkap: req.NamaLengkap,
@@ -80,17 +77,14 @@ func (c *UserController) UpdateProfile(ctx *gin.Context) {
 		Pangkat:     req.Pangkat,
 	}
 
-	updatedUser, err := c.userService.UpdateProfile(userID.(uint), dataToUpdate)
+	updatedUser, err := c.userService.UpdateProfile(userID, dataToUpdate)
 	if err != nil {
 		log.Printf("ERROR: Gagal memperbarui profil untuk user ID %d: %v", userID, err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Terjadi kesalahan pada server."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal memperbarui profil.")
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Profil berhasil diperbarui.",
-		"user":    updatedUser,
-	})
+	APIResponse(ctx, http.StatusOK, "Profil berhasil diperbarui.", gin.H{"user": updatedUser})
 }
 
 // @Summary Mengubah Kata Sandi Pengguna
@@ -107,33 +101,28 @@ func (c *UserController) UpdateProfile(ctx *gin.Context) {
 func (c *UserController) ChangePassword(ctx *gin.Context) {
 	var req ChangePasswordRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Semua kolom wajib diisi dan kata sandi baru minimal 8 karakter."})
+		APIError(ctx, http.StatusBadRequest, "Semua kolom wajib diisi dan kata sandi baru minimal 8 karakter.")
 		return
 	}
-
 	if req.NewPassword != req.ConfirmPassword {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Konfirmasi kata sandi baru tidak cocok."})
+		APIError(ctx, http.StatusBadRequest, "Konfirmasi kata sandi baru tidak cocok.")
 		return
 	}
 
-	userID, exists := ctx.Get("userID")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Pengguna tidak terautentikasi."})
-		return
-	}
+	userID := ctx.GetUint("userID")
 
-	err := c.userService.ChangePassword(userID.(uint), req.OldPassword, req.NewPassword)
+	err := c.userService.ChangePassword(userID, req.OldPassword, req.NewPassword)
 	if err != nil {
 		log.Printf("Gagal mengubah password untuk user ID %d: %v", userID, err)
-		if err.Error() == "kata sandi saat ini yang Anda masukkan salah" {
-			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		if errors.Is(err, services.ErrOldPasswordMismatch) {
+			APIError(ctx, http.StatusConflict, err.Error())
 		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Terjadi kesalahan pada server."})
+			APIError(ctx, http.StatusInternalServerError, "Gagal mengubah kata sandi.")
 		}
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Kata sandi berhasil diperbarui."})
+	APIResponse(ctx, http.StatusOK, "Kata sandi berhasil diperbarui.", nil)
 }
 
 // @Summary Membuat Pengguna Baru
@@ -150,66 +139,94 @@ func (c *UserController) ChangePassword(ctx *gin.Context) {
 func (c *UserController) Create(ctx *gin.Context) {
 	var req CreateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		APIError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-	actorID, _ := ctx.Get("userID")
+	actorID := ctx.GetUint("userID")
 
-	user := models.User{NamaLengkap: req.NamaLengkap, NRP: req.NRP, KataSandi: req.KataSandi, Pangkat: req.Pangkat, Peran: req.Peran, Jabatan: req.Jabatan, Regu: req.Regu}
+	user := models.User{
+		NamaLengkap: req.NamaLengkap,
+		NRP:         req.NRP,
+		KataSandi:   req.KataSandi,
+		Pangkat:     req.Pangkat,
+		Peran:       req.Peran,
+		Jabatan:     req.Jabatan,
+		Regu:        req.Regu,
+	}
 
-	if err := c.userService.Create(&user, actorID.(uint)); err != nil {
+	if err := c.userService.Create(&user, actorID); err != nil {
 		log.Printf("ERROR: Gagal membuat pengguna: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Terjadi kesalahan pada server saat membuat pengguna."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal membuat pengguna.")
 		return
 	}
 	ctx.JSON(http.StatusCreated, user)
 }
 
 func (c *UserController) Update(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		APIError(ctx, http.StatusBadRequest, "ID Pengguna tidak valid")
+		return
+	}
 	var req UpdateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		APIError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	if req.KataSandi != "" && len(req.KataSandi) < 8 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Kata sandi baru minimal 8 karakter"})
+		APIError(ctx, http.StatusBadRequest, "Kata sandi baru minimal 8 karakter")
 		return
 	}
-	actorID, _ := ctx.Get("userID")
+	actorID := ctx.GetUint("userID")
 
-	user := models.User{ID: uint(id), NamaLengkap: req.NamaLengkap, NRP: req.NRP, Pangkat: req.Pangkat, Peran: req.Peran, Jabatan: req.Jabatan, Regu: req.Regu}
+	user := models.User{
+		ID:          uint(id),
+		NamaLengkap: req.NamaLengkap,
+		NRP:         req.NRP,
+		Pangkat:     req.Pangkat,
+		Peran:       req.Peran,
+		Jabatan:     req.Jabatan,
+		Regu:        req.Regu,
+	}
 
-	if err := c.userService.Update(&user, req.KataSandi, actorID.(uint)); err != nil {
+	if err := c.userService.Update(&user, req.KataSandi, actorID); err != nil {
 		log.Printf("ERROR: Gagal memperbarui pengguna id %d: %v", id, err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Terjadi kesalahan pada server saat memperbarui pengguna."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal memperbarui pengguna.")
 		return
 	}
 	ctx.JSON(http.StatusOK, user)
 }
 
 func (c *UserController) Delete(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	actorID, _ := ctx.Get("userID")
-
-	if err := c.userService.Deactivate(uint(id), actorID.(uint)); err != nil {
-		log.Printf("ERROR: Gagal menonaktifkan pengguna id %d: %v", id, err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menonaktifkan pengguna."})
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		APIError(ctx, http.StatusBadRequest, "ID Pengguna tidak valid")
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Pengguna berhasil dinonaktifkan"})
+	actorID := ctx.GetUint("userID")
+
+	if err := c.userService.Deactivate(uint(id), actorID); err != nil {
+		log.Printf("ERROR: Gagal menonaktifkan pengguna id %d: %v", id, err)
+		APIError(ctx, http.StatusInternalServerError, "Gagal menonaktifkan pengguna.")
+		return
+	}
+	APIResponse(ctx, http.StatusOK, "Pengguna berhasil dinonaktifkan", nil)
 }
 
 func (c *UserController) Activate(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
-	actorID, _ := ctx.Get("userID")
-
-	if err := c.userService.Activate(uint(id), actorID.(uint)); err != nil {
-		log.Printf("ERROR: Gagal mengaktifkan pengguna id %d: %v", id, err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengaktifkan pengguna."})
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		APIError(ctx, http.StatusBadRequest, "ID Pengguna tidak valid")
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Pengguna berhasil diaktifkan"})
+	actorID := ctx.GetUint("userID")
+
+	if err := c.userService.Activate(uint(id), actorID); err != nil {
+		log.Printf("ERROR: Gagal mengaktifkan pengguna id %d: %v", id, err)
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengaktifkan pengguna.")
+		return
+	}
+	APIResponse(ctx, http.StatusOK, "Pengguna berhasil diaktifkan", nil)
 }
 
 // @Summary Mendapatkan Semua Pengguna
@@ -226,17 +243,21 @@ func (c *UserController) FindAll(ctx *gin.Context) {
 	users, err := c.userService.FindAll(statusFilter)
 	if err != nil {
 		log.Printf("ERROR: Gagal mengambil data semua pengguna: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data pengguna."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data pengguna.")
 		return
 	}
 	ctx.JSON(http.StatusOK, users)
 }
 
 func (c *UserController) FindByID(ctx *gin.Context) {
-	id, _ := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 32)
+	if err != nil {
+		APIError(ctx, http.StatusBadRequest, "ID Pengguna tidak valid")
+		return
+	}
 	user, err := c.userService.FindByID(uint(id))
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "Pengguna tidak ditemukan"})
+		APIError(ctx, http.StatusNotFound, "Pengguna tidak ditemukan")
 		return
 	}
 	ctx.JSON(http.StatusOK, user)
@@ -246,7 +267,7 @@ func (c *UserController) FindOperators(ctx *gin.Context) {
 	operators, err := c.userService.FindOperators()
 	if err != nil {
 		log.Printf("ERROR: Gagal mengambil data operator: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data operator."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data operator.")
 		return
 	}
 	ctx.JSON(http.StatusOK, operators)

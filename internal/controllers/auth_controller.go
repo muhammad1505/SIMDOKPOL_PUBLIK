@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	//"log"
 	"net/http"
 	"simdokpol/internal/services"
 
@@ -21,7 +20,6 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required" example:"password123"`
 }
 
-// --- TAMBAHKAN BLOK KOMENTAR SWAGGER DI SINI ---
 // @Summary Login Pengguna
 // @Description Melakukan otentikasi pengguna berdasarkan NRP dan kata sandi, lalu mengembalikan token JWT dalam HttpOnly cookie.
 // @Tags Authentication
@@ -35,28 +33,24 @@ type LoginRequest struct {
 func (c *AuthController) Login(ctx *gin.Context) {
 	var req LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "NRP dan Kata Sandi diperlukan"})
+		APIError(ctx, http.StatusBadRequest, "NRP dan Kata Sandi diperlukan")
 		return
 	}
 
 	token, err := c.service.Login(req.NRP, req.Password)
 	if err != nil {
-		// Tidak perlu log error di sini karena service sudah memberikan pesan yang aman untuk pengguna
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		APIError(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
-	// Set token di dalam httpOnly cookie untuk keamanan
-	// Durasi cookie 24 jam (dalam detik)
+	// Untuk production, 'secure' harus true dan 'domain' disesuaikan
 	ctx.SetCookie("token", token, 3600*24, "/", "localhost", false, true)
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Login berhasil"})
+	APIResponse(ctx, http.StatusOK, "Login berhasil", nil)
 }
 
-// (Fungsi Logout tidak perlu didokumentasikan di Swagger untuk saat ini)
+// Logout tidak memerlukan dokumentasi Swagger
 func (c *AuthController) Logout(ctx *gin.Context) {
-	// Cara menghapus cookie adalah dengan mengaturnya kembali
-	// dengan waktu kedaluwarsa di masa lalu (MaxAge < 0)
 	ctx.SetCookie("token", "", -1, "/", "localhost", false, true)
-	ctx.JSON(http.StatusOK, gin.H{"message": "Logout berhasil"})
+	APIResponse(ctx, http.StatusOK, "Logout berhasil", nil)
 }

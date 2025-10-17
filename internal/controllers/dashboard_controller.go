@@ -3,7 +3,6 @@ package controllers
 import (
 	"log"
 	"net/http"
-	_ "simdokpol/internal/models" // <-- PERBAIKAN: Ditambahkan blank identifier '_'
 	"simdokpol/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -25,16 +24,15 @@ func NewDashboardController(service services.DashboardService) *DashboardControl
 // @Security BearerAuth
 // @Router /notifications/expiring-documents [get]
 func (c *DashboardController) GetExpiringDocuments(ctx *gin.Context) {
-	userID, exists := ctx.Get("userID")
-	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Pengguna tidak terautentikasi"})
-		return
-	}
+	userID := ctx.GetUint("userID")
 
+	// Jendela notifikasi diatur ke 3 hari sebelum kedaluwarsa.
+	// Angka ini bisa dibuat dinamis dari konfigurasi jika diperlukan.
 	notificationWindowDays := 3
-	documents, err := c.service.GetExpiringDocumentsForUser(userID.(uint), notificationWindowDays)
+	documents, err := c.service.GetExpiringDocumentsForUser(userID, notificationWindowDays)
 	if err != nil {
 		log.Printf("ERROR: Gagal mengambil notifikasi dokumen kedaluwarsa untuk user ID %d: %v", userID, err)
+		// Kembalikan array kosong agar tidak merusak UI frontend
 		ctx.JSON(http.StatusOK, []string{})
 		return
 	}
@@ -53,7 +51,8 @@ func (c *DashboardController) GetExpiringDocuments(ctx *gin.Context) {
 func (c *DashboardController) GetStats(ctx *gin.Context) {
 	stats, err := c.service.GetDashboardStats()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data statistik"})
+		log.Printf("ERROR: Gagal mengambil statistik dasbor: %v", err)
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data statistik")
 		return
 	}
 	ctx.JSON(http.StatusOK, stats)
@@ -70,7 +69,8 @@ func (c *DashboardController) GetStats(ctx *gin.Context) {
 func (c *DashboardController) GetMonthlyChart(ctx *gin.Context) {
 	chartData, err := c.service.GetMonthlyIssuanceChartData()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data grafik"})
+		log.Printf("ERROR: Gagal mengambil data grafik bulanan: %v", err)
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data grafik")
 		return
 	}
 	ctx.JSON(http.StatusOK, chartData)
@@ -87,7 +87,8 @@ func (c *DashboardController) GetMonthlyChart(ctx *gin.Context) {
 func (c *DashboardController) GetItemCompositionChart(ctx *gin.Context) {
 	pieData, err := c.service.GetItemCompositionPieChartData()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data komposisi barang"})
+		log.Printf("ERROR: Gagal mengambil data komposisi barang: %v", err)
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data komposisi barang")
 		return
 	}
 	ctx.JSON(http.StatusOK, pieData)

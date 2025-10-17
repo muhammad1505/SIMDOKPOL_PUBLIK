@@ -3,7 +3,6 @@ package controllers
 import (
 	"log"
 	"net/http"
-	_ "simdokpol/internal/dto" // <-- PERBAIKAN: Ditambahkan blank identifier '_'
 	"simdokpol/internal/models"
 	"simdokpol/internal/services"
 	"strings"
@@ -35,7 +34,7 @@ func (c *SettingsController) GetSettings(ctx *gin.Context) {
 	config, err := c.configService.GetConfig()
 	if err != nil {
 		log.Printf("ERROR: Gagal mengambil data pengaturan: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data pengaturan."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal mengambil data pengaturan.")
 		return
 	}
 	ctx.JSON(http.StatusOK, config)
@@ -55,25 +54,26 @@ func (c *SettingsController) GetSettings(ctx *gin.Context) {
 func (c *SettingsController) UpdateSettings(ctx *gin.Context) {
 	var settings map[string]string
 	if err := ctx.ShouldBindJSON(&settings); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Format data tidak valid"})
+		APIError(ctx, http.StatusBadRequest, "Format data tidak valid")
 		return
 	}
 
+	// Validasi keamanan sederhana untuk path traversal
 	if path, exists := settings["backup_path"]; exists {
 		if strings.Contains(path, "..") {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Path tidak valid. Tidak boleh mengandung '..'"})
+			APIError(ctx, http.StatusBadRequest, "Path tidak valid. Tidak boleh mengandung '..'")
 			return
 		}
 	}
 
 	if err := c.configService.SaveConfig(settings); err != nil {
 		log.Printf("ERROR: Gagal menyimpan pengaturan: %v", err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan pengaturan."})
+		APIError(ctx, http.StatusInternalServerError, "Gagal menyimpan pengaturan.")
 		return
 	}
 
-	actorID, _ := ctx.Get("userID")
-	c.auditService.LogActivity(actorID.(uint), models.AuditSettingsUpdated, "Pengaturan sistem telah diperbarui.")
+	actorID := ctx.GetUint("userID")
+	c.auditService.LogActivity(actorID, models.AuditSettingsUpdated, "Pengaturan sistem telah diperbarui.")
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Pengaturan berhasil disimpan"})
+	APIResponse(ctx, http.StatusOK, "Pengaturan berhasil disimpan", nil)
 }
