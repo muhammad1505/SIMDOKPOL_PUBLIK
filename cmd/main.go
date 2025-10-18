@@ -58,7 +58,7 @@ func main() {
 // onReady adalah fungsi yang akan dijalankan saat ikon tray siap.
 func onReady() {
 	// Setup ikon dan tooltip
-	systray.SetIcon(getIcon("web/static/img/icon.png"))
+	systray.SetIcon(getIcon("web/static/img/icon.ico"))
 	systray.SetTitle("SIMDOKPOL")
 	systray.SetTooltip("Sistem Informasi Manajemen Dokumen Kepolisian")
 
